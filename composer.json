@@ -1,0 +1,7 @@
+{
+    "name": "flundr/core",
+    "description": "Core files for a flat PHP MVC Framework",
+    "require": {
+        "php": "^7.0"
+    }
+}
