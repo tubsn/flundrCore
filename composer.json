@@ -3,5 +3,12 @@
     "description": "Core files for a flat PHP MVC Framework",
     "require": {
         "php": "^7.0"
-    }
+    },
+    "autoload": {
+        "psr-4": {
+            "flundr\\core\\": "core/"
+	}
+},
+
+
 }
