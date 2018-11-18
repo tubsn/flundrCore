@@ -12,8 +12,11 @@ class App {
 
 	public function __construct() {
 
+		if (DEBUG_MODE) {
+			error_reporting(E_ALL);
+		}
+
 		try {
-			$this->get_config();
 			$this->handle_URL_routing();
 			$this->run_controller();
 		}
@@ -21,29 +24,6 @@ class App {
 		catch (\Exception $e) {
 			http_response_code(404);
 			echo $e->getMessage();
-		}
-
-	}
-
-	private function get_config() {
-
-		// configure required Paths
-		define('ROOT', dirname(__DIR__,2) . DIRECTORY_SEPARATOR);
-		define('APP', ROOT . 'app' . DIRECTORY_SEPARATOR);
-		define('TEMPLATES', APP . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
-		define('TEMPLATE_EXTENSION', '.tpl');
-		define('PAGEURL', (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]");
-
-		$configPath = APP . 'config' . DIRECTORY_SEPARATOR . 'config.php';
-
-		if (file_exists($configPath)){
-
-			require $configPath;
-
-			if (DEBUG_MODE) {
-				error_reporting(E_ALL);
-			}
-
 		}
 
 	}
