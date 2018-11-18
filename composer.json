@@ -7,8 +7,6 @@
     "autoload": {
         "psr-4": {
             "flundr\\core\\": "core/"
+			}
 	}
-},
-
-
 }
