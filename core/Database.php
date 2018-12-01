@@ -5,31 +5,16 @@ namespace flundr\core;
 class Database {
 
 	protected $db;
-	protected $dbHost;
-	protected $dbUser;
-	protected $dbPW;
-	protected $dbName;
-
 	public $table;
 
-	public function __construct() {
-		$this->connect_to_sql();
-	}
+	public function connect($dbHost, $dbUser, $dbPW, $dbName) {
 
-	public function connect_to_sql() {
-
-		$database = new SQLCon(
-			$this->dbHost,
-			$this->dbUser,
-			$this->dbPW,
-			$this->dbName
-		);
-
+		$database = new SQLCon($dbHost,$dbUser,$dbPW,$dbName);
 		$this->db = $database->connection;
 
 	}
 
-	public function formatPDOPrepare(array $data) {
+	public function formatPDOPrepare(array $data, $keepIDs = false) {
 
 		$fieldNames = '';
 		$valueNames = '';
@@ -41,8 +26,8 @@ class Database {
 			// Remove CSRF Challange Token from Post Forms
 			if (strtolower($fieldName) == 'challange') {continue;}
 
-			// Remove Possibility to change IDs
-			if (strtolower($fieldName) == 'id') {continue;}
+			// Remove IDs as long as keep IDs is false
+			if (!$keepIDs && strtolower($fieldName) == 'id') {continue;}
 
 			// Ignore empty Fields "" but not NULL Values
 			if ((empty($value) && !is_null($value)) && ($value !== 0) && ($value !== '0')) {continue;}
@@ -161,10 +146,39 @@ class Database {
 		try {
 			$stmt = $this->db->prepare("UPDATE `$this->table` SET $updateFields WHERE `ID` = $id LIMIT 1");
 			$stmt->execute($values);
+
 			return $stmt->rowCount(); // Returns 1 if something got changed
 		}
 		catch(\PDOException $e) {
-			new errorController('<b>'.__CLASS__.' Could not Edit Post: </b> '.$e->getMessage());
+			//new errorController('<b>'.__CLASS__.' Could not Edit Post: </b> '.$e->getMessage());
+			echo $e->getMessage();
+			die; // error
+		}
+
+	}
+
+	// Replace Stuff even IDs, use with care! As this actually deletes rows
+	public function replace($data) {
+
+		$data = saniLib::sanitizeData($data);
+
+		// Sanitize Data, Hash Passwords and Pre-Format for PDO->prepare
+		$data = $this->formatPDOPrepare($data,true);
+
+		// Reassign the preformated fields to Variables for the Query
+		$fieldNames=$data['fieldNames']; // `Fieldname1`,`Fieldname2` ...
+		$valueNames=$data['valueNames']; // :Fieldname1,:Fieldname2, ...
+		$values=$data['values']; // Escaped Values
+
+		try {
+			$stmt = $this->db->prepare("REPLACE INTO `$this->table` ($fieldNames) VALUES ($valueNames)");
+
+			$stmt->execute($values);
+			return ($this->db->lastInsertId()); // Return a New ID on Success
+		}
+		catch(\PDOException $e) {
+			//new errorController('<b>'.__CLASS__.' Could not create Element: </b> '.$e->getMessage());
+			echo $e->getMessage();
 			die; // error
 		}
 
@@ -211,6 +225,36 @@ class Database {
 		}
 
 	}
+
+
+	public function getFields() {
+
+		try {
+			$stmt = $this->db->prepare("
+				SELECT column_name
+				FROM information_schema.columns
+				WHERE  table_name = '$this->table'
+			");
+			$stmt->execute();
+			$columns = $stmt->fetchAll();
+
+			$fieldNames = [];
+
+			foreach ($columns as $field) {
+				array_push($fieldNames, $field['column_name']);
+			}
+
+			return $fieldNames;
+
+		}
+
+		catch(\PDOException $e) {
+			echo $e->getMessage();
+			die; // error
+		}
+
+	}
+
 
 	// Date Reformat Helper
 	public function formatDate($date, $format='Y-m-d') {

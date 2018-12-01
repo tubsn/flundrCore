@@ -2,6 +2,8 @@
 
 namespace flundr\core;
 
+use flundr\model\userDB;
+
 class App {
 
 	const CONTROLLER_NAMESPACE = '\\flundr\\controller\\';
@@ -9,23 +11,61 @@ class App {
 	private $controller = self::CONTROLLER_NAMESPACE . 'Home';
 	private $action = 'index';
 	private $parameters = [];
+	private $isProductionEnv = true;
 
 	public function __construct() {
 
 		if (DEBUG_MODE) {
+			$this->isProductionEnv = false;
 			error_reporting(E_ALL);
 		}
 
 		try {
+			$this->identifyUser();
 			$this->handle_URL_routing();
 			$this->run_controller();
 		}
 
-		catch (\Exception $e) {
-			http_response_code(404);
-			echo $e->getMessage();
+		catch (\Exception $errorData) {
+			new ErrorHandler($errorData);
 		}
 
+	}
+
+
+	//Starts the Global Session and Checks if the User has an Login Cookie
+	protected function identifyUser() {
+
+		// Check if there is a UserDB setup
+		if (!class_exists('\flundr\model\userDB')) {
+			return;
+		}
+
+		Session::init();
+
+		// Check if User is logged in
+		if (Session::get('userLoggedIn') == false) {
+
+			// Check if Logincookie exists or return
+			if (!isset($_COOKIE[LOGINCOOKIE_NAME])) {return false;}
+
+			// Try to login with Cookie
+			$userDB = new userDB();
+			$userDB->loginWithCookie();
+
+			// Set Session Info from UserDB Model Data
+			if ($userDB->userLoggedIn == true) {
+				Session::set('userLoggedIn', true);
+				Session::set('CSRFToken', cryptLib::generateKey(12,1)); // CSRF Token for this Session
+				Session::set('userID', $userDB->userID);
+				Session::set('userName', $userDB->userName);
+				Session::set('userMail', $userDB->userMail);
+				Session::set('userGroup', $userDB->userGroup);
+				Session::set('userLevel', $userDB->userLevel);
+			}
+
+			unset($userDB);
+		}
 	}
 
 	private function handle_URL_routing() {
@@ -63,19 +103,25 @@ class App {
 	private function run_controller() {
 
 		if (!class_exists($this->controller)) {
-			throw new \Exception('Controller not Found');
+			if($this->isProductionEnv) {
+				// In Production Environment use nice Errors
+				throw new \Exception('Requested URL not Found',0);
+			}
+			throw new \Exception('Controller/Route (<mark>'.$this->controller.'</mark>) not found',2);
 		}
 
 		// Assign the Controller to the App
 		$this->controller = new $this->controller;
 
 		if (!is_callable([$this->controller,$this->action])) {
-			throw new \Exception('Action: '.$this->action.' not found or private');
+			if($this->isProductionEnv) {
+				// In Production Environment use nice Errors
+				throw new \Exception('Requested URL not Found',0);
+			}
+			throw new \Exception('Method/Action (<mark>'.$this->action.'</mark>) not found or is private',2);
 		}
 
 		// Call the Controller with Action and possible Params
 		call_user_func_array([$this->controller,$this->action], $this->parameters);
-
 	}
-
 }
