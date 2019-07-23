@@ -60,7 +60,7 @@ class App {
 				Session::set('userID', $userDB->userID);
 				Session::set('userName', $userDB->userName);
 				Session::set('userMail', $userDB->userMail);
-				Session::set('userGroup', $userDB->userGroup);
+				Session::set('userRights', $userDB->userRights);
 				Session::set('userLevel', $userDB->userLevel);
 			}
 
@@ -70,7 +70,7 @@ class App {
 
 	private function handle_URL_routing() {
 
-		$url = $_SERVER['SCRIPT_URL'];
+		$url = $_SERVER['REQUEST_URI'];
 
 		if ($url === '/') {return;}
 

@@ -99,7 +99,7 @@ class uploadLib {
 			$img->resizeToWidth($maxWidth);
 
 			$internalpath = $this->internalUploadPath . DIRECTORY_SEPARATOR . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
-			$thumbpath = $this->publicUploadPath . DIRECTORY_SEPARATOR . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
+			$thumbpath = $this->publicUploadPath . '/' . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
 
 			$img->save($internalpath);
 
@@ -148,7 +148,7 @@ class uploadLib {
 				$seededFileName = sprintf('%s_%s.%s', $file['nameonly'],$randSeed,$file['ext']);
 				$file['seedednameonly'] = sprintf('%s_%s', $file['nameonly'],$randSeed);
 				$file['pathinternal'] = $this->publicUploadPath.DIRECTORY_SEPARATOR.$seededFileName;
-				$file['path'] = $this->publicUploadPath.DIRECTORY_SEPARATOR.$seededFileName;
+				$file['path'] = $this->publicUploadPath.'/'.$seededFileName;
 
 				// Save file on disk
 				move_uploaded_file($file['tmp_name'], $file['pathinternal']);

@@ -31,6 +31,7 @@ class Database {
 
 			// Ignore empty Fields "" but not NULL Values
 			if ((empty($value) && !is_null($value)) && ($value !== 0) && ($value !== '0')) {continue;}
+			//if ((empty($value) && !is_null($value))) {continue;}
 
 			// If Fieldname == Password and not Empty -> hash the Password
 			if (strtolower($fieldName) == 'password' || strtolower($fieldName) == 'passwort') {
@@ -76,16 +77,10 @@ class Database {
 
 		$fieldsString = implode (',', $fields); // Selected fields comma separated
 
-		try {
-			$stmt = $this->db->prepare("SELECT $fieldsString FROM `$this->table`
+		$stmt = $this->db->prepare("SELECT $fieldsString FROM `$this->table`
 										WHERE `ID` = :ID ");
-			$stmt->execute([':ID' => $id]);
-			return ($stmt->fetch()); // return Element
-		}
-		catch(\PDOException $e) {
-			new errorController('<b>'.__CLASS__.': </b> '.$e->getMessage());
-			die; // error
-		}
+		$stmt->execute([':ID' => $id]);
+		return ($stmt->fetch()); // return Element
 	}
 
 	// Selects some Elements based on an Array of IDs
@@ -95,16 +90,11 @@ class Database {
 		$orderBy = "`".str_replace("`", "``", $orderBy)."`"; // Escaping the OrderBy String
 		$order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Order only ASC or DESC
 
-		try {
-			$stmt = $this->db->prepare("SELECT * FROM `$this->table`
+		$stmt = $this->db->prepare("SELECT * FROM `$this->table`
 										WHERE `ID` IN ($listOfIds) ORDER BY $orderBy $order");
-			$stmt->execute();
-			return ($stmt->fetchAll()); // return Entry
-		}
-		catch(\PDOException $e) {
-			new errorController('<b>'.__CLASS__.': </b> '.$e->getMessage());
-			die; // error
-		}
+		$stmt->execute();
+		return ($stmt->fetchAll()); // return Entry
+
 	}
 
 	// Selects all Elements
@@ -115,16 +105,12 @@ class Database {
 		$orderBy = "`".str_replace("`", "``", $orderBy)."`"; // Escaping the OrderBy String
 		$order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC'; // Order only ASC or DESC
 
-		try {
-			$stmt = $this->db->prepare("SELECT * FROM `$this->table`
-										ORDER BY $orderBy $order LIMIT $limit");
-			$stmt->execute();
-			return ($stmt->fetchAll()); // return Elements Array
-		}
-		catch(\PDOException $e) {
-			new errorController('<b>'.__CLASS__.': </b> '.$e->getMessage());
-			die; // error
-		}
+		$stmt = $this->db->prepare("SELECT * FROM `$this->table`
+									ORDER BY $orderBy $order LIMIT $limit");
+		$stmt->execute();
+		return ($stmt->fetchAll()); // return Elements Array
+
+
 	}
 
 	// Edit Stuff in DB
@@ -216,14 +202,7 @@ class Database {
 	// delete stuff in DB
 	public function delete($id) {
 		$id = abs(intval($id)); // Force positive INT
-		try {
-			return $this->db->exec("DELETE FROM `$this->table` WHERE `ID` = $id");
-		}
-		catch(\PDOException $e) {
-			new errorController('<b>'.__CLASS__.' Could not delete Blogpost: </b> '.$e->getMessage());
-			die; // error
-		}
-
+		return $this->db->exec("DELETE FROM `$this->table` WHERE `ID` = $id");
 	}
 
 
@@ -255,6 +234,21 @@ class Database {
 
 	}
 
+	public function checkForNull($array) {
+		// Check for Empty Fields and Convert them to Null
+		return array_map(array($this, 'setToNull'), $array);
+
+	}
+
+	private function setToNull($entry) {
+
+		if ($entry == '') {
+			return null;
+		}
+
+		return $entry;
+
+	}
 
 	// Date Reformat Helper
 	public function formatDate($date, $format='Y-m-d') {

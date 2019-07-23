@@ -76,6 +76,9 @@ abstract class Controller {
 			return true;
 		}
 
+		// set Referer for Redirects
+		Session::set('referer', $_SERVER['REQUEST_URI']);
+
 		// Display Login Page
 		header('Location: /login/'); die;
 

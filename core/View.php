@@ -34,5 +34,4 @@ abstract class View {
 
 	}
 
-
 }
