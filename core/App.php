@@ -70,7 +70,8 @@ class App {
 
 	private function handle_URL_routing() {
 
-		$url = $_SERVER['REQUEST_URI'];
+		// Get Url without ?_GET Parameters
+		$url = strtok($_SERVER["REQUEST_URI"],'?');
 
 		if ($url === '/') {return;}
 
