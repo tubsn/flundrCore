@@ -1,6 +1,6 @@
 <?php
 
-namespace flundr\Core;
+namespace flundr\utility;
 
 class Pager
 {

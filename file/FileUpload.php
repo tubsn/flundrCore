@@ -1,8 +1,10 @@
 <?php
 
-namespace flundr\core;
+namespace flundr\file;
 
-class uploadLib {
+use flundr\file\ImageResizer;
+
+class FileUpload {
 
 	/*********************
 	**	 File Uploads	**
@@ -36,7 +38,7 @@ class uploadLib {
 		// Max FileSize höchstens 100mb
 		if ($size > 100) {$size=100;}
 		$this->maxFileSize = $size * 1024 * 1024;
-		$this->internalUploadPath = HTDOCS.$path;
+		$this->internalUploadPath = PUBLICFOLDER.$path;
 		$this->publicUploadPath = $path;
 		$this->maxFiles = $maxFiles;
 		$this->overwrite = $overwrite;
@@ -94,12 +96,12 @@ class uploadLib {
 
 		try {
 
-			$img = new imageLib($origFile['path']);
+			$img = new ImageResizer($origFile['path']);
 
 			$img->resizeToWidth($maxWidth);
 
 			$internalpath = $this->internalUploadPath . DIRECTORY_SEPARATOR . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
-			$thumbpath = $this->publicUploadPath . '/' . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
+			$thumbpath = $this->publicUploadPath . DIRECTORY_SEPARATOR . $origFile['seedednameonly'] . $suffix . '.' . $origFile['ext'];
 
 			$img->save($internalpath);
 
@@ -119,6 +121,8 @@ class uploadLib {
 
 		$uploadedFiles = [];
 		$errorFiles = [];
+
+		if (!is_dir($this->publicUploadPath)) {mkdir($this->publicUploadPath);}
 
 		foreach ($fileData as $file) {
 
@@ -148,7 +152,9 @@ class uploadLib {
 				$seededFileName = sprintf('%s_%s.%s', $file['nameonly'],$randSeed,$file['ext']);
 				$file['seedednameonly'] = sprintf('%s_%s', $file['nameonly'],$randSeed);
 				$file['pathinternal'] = $this->publicUploadPath.DIRECTORY_SEPARATOR.$seededFileName;
-				$file['path'] = $this->publicUploadPath.'/'.$seededFileName;
+				$file['path'] = $this->publicUploadPath.DIRECTORY_SEPARATOR.$seededFileName;
+
+
 
 				// Save file on disk
 				move_uploaded_file($file['tmp_name'], $file['pathinternal']);

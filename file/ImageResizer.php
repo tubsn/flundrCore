@@ -6,9 +6,9 @@
  * https://github.com/gumlet/php-image-resize
  */
 
-namespace flundr\core;
+namespace flundr\file;
 
-class imageLib
+class ImageResizer
 {
     const CROPTOP = 1;
     const CROPCENTRE = 2;

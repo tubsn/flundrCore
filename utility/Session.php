@@ -1,6 +1,6 @@
 <?php
 
-namespace flundr\core;
+namespace flundr\utility;
 
 class Session
 {
@@ -21,6 +21,13 @@ class Session
 		if (isset($_SESSION[$key])) {
 			return $_SESSION[$key];
 		} else {return false;}
+	}
+
+	// Read Whole Session
+	public static function get_data() {
+		if (isset($_SESSION)) {
+			return $_SESSION;
+		}
 	}
 
 	// Unset Session Variable

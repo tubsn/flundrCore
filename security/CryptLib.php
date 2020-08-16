@@ -4,9 +4,9 @@
  * Original Cryptor Script - Copyright (c) 2016 ionCube Ltd.
  */
 
-namespace flundr\core;
+namespace flundr\security;
 
-class cryptLib
+class CryptLib
 {
     private $cipher_algo;
     private $hash_algo;
@@ -23,7 +23,7 @@ class cryptLib
      * @param string $hash_algo   Key hashing algorithm.
      * @param [type] $fmt         Format of the encrypted data.
      */
-    public function __construct($cipher_algo = 'aes-256-ctr', $hash_algo = 'sha256', $fmt = cryptlib::FORMAT_B64)
+    public function __construct($cipher_algo = 'aes-256-ctr', $hash_algo = 'sha256', $fmt = CryptLib::FORMAT_B64)
     {
         $this->cipher_algo = $cipher_algo;
         $this->hash_algo = $hash_algo;
@@ -31,12 +31,12 @@ class cryptLib
 
         if (!in_array($cipher_algo, openssl_get_cipher_methods(true)))
         {
-            throw new \Exception("cryptlib:: - unknown cipher algo {$cipher_algo}");
+            throw new \Exception("CryptLib:: - unknown cipher algo {$cipher_algo}");
         }
 
         if (!in_array($hash_algo, openssl_get_md_methods(true)))
         {
-            throw new \Exception("cryptlib:: - unknown hash algo {$hash_algo}");
+            throw new \Exception("CryptLib:: - unknown hash algo {$hash_algo}");
         }
 
         $this->iv_num_bytes = openssl_cipher_iv_length($cipher_algo);
@@ -59,7 +59,7 @@ class cryptLib
         // Build an initialisation vector
         $iv = openssl_random_pseudo_bytes($this->iv_num_bytes, $isStrongCrypto);
         if (!$isStrongCrypto) {
-            throw new \Exception("cryptlib::encryptString() - Not a strong key");
+            throw new \Exception("CryptLib::encryptString() - Not a strong key");
         }
 
         // Hash the key
@@ -71,18 +71,18 @@ class cryptLib
 
         if ($encrypted === false)
         {
-            throw new \Exception('cryptlib::encryptString() - Encryption failed: ' . openssl_error_string());
+            throw new \Exception('CryptLib::encryptString() - Encryption failed: ' . openssl_error_string());
         }
 
         // The result comprises the IV and encrypted data
         $res = $iv . $encrypted;
 
         // and format the result if required.
-        if ($fmt == cryptlib::FORMAT_B64)
+        if ($fmt == CryptLib::FORMAT_B64)
         {
             $res = base64_encode($res);
         }
-        else if ($fmt == cryptlib::FORMAT_HEX)
+        else if ($fmt == CryptLib::FORMAT_HEX)
         {
             $res = unpack('H*', $res)[1];
         }
@@ -107,11 +107,11 @@ class cryptLib
         $raw = $in;
 
         // Restore the encrypted data if encoded
-        if ($fmt == cryptlib::FORMAT_B64)
+        if ($fmt == CryptLib::FORMAT_B64)
         {
             $raw = base64_decode($in);
         }
-        else if ($fmt == cryptlib::FORMAT_HEX)
+        else if ($fmt == CryptLib::FORMAT_HEX)
         {
             $raw = pack('H*', $in);
         }
@@ -119,7 +119,7 @@ class cryptLib
         // and do an integrity check on the size.
         if (strlen($raw) < $this->iv_num_bytes)
         {
-            throw new \Exception('cryptlib::decryptString() - ' .
+            throw new \Exception('CryptLib::decryptString() - ' .
                 'data length ' . strlen($raw) . " is less than iv length {$this->iv_num_bytes}");
         }
 
@@ -136,7 +136,7 @@ class cryptLib
 
         if ($res === false)
         {
-            throw new \Exception('cryptlib::decryptString - decryption failed: ' . openssl_error_string());
+            throw new \Exception('CryptLib::decryptString - decryption failed: ' . openssl_error_string());
         }
 
         return $res;
@@ -151,7 +151,7 @@ class cryptLib
      */
     public static function encrypt($in, $key, $fmt = null)
     {
-        $c = new cryptlib();
+        $c = new CryptLib();
         return $c->encryptString($in, $key, $fmt);
     }
 
@@ -164,7 +164,7 @@ class cryptLib
      */
     public static function decrypt($in, $key, $fmt = null)
     {
-        $c = new cryptlib();
+        $c = new CryptLib();
         return $c->decryptString($in, $key, $fmt);
     }
 
@@ -181,43 +181,32 @@ class cryptLib
      * @param  bool $hex	Hex oder Base64
 	 * @return string		Gibt den Key aus.
      */
-	public static function generateKey($length=32, $hex=false) {
+	public static function generate_key($length=32, $hex=false) {
 
 		if ($hex) { return bin2hex(openssl_random_pseudo_bytes($length, $crypto_strong)); }
 		else { return base64_encode(openssl_random_pseudo_bytes($length, $crypto_strong)); }
 
 	} // End generateKey
 
-
-// -------------------------------------------------------------------- //
-
-
-	public static function hashPW($password, $iterationCost=10) {
+	public static function hash($password, $iterationCost=10) {
 
 		return password_hash($password, PASSWORD_DEFAULT, ['cost' => $iterationCost]);
 
-	} // End hashPW
+	}
 
-
-// -------------------------------------------------------------------- //
-
-
-	public static function checkPW($password, $hash) {
+	public static function verify($password, $hash) {
 
 		// Gibt true wenn Passwort stimmt
 		return password_verify($password, $hash);
 
-	} // End checkPW
+	}
 
-
-// -------------------------------------------------------------------- //
-
-	public static function hashInfo($hash) {
+	public static function hash_info($hash) {
 
 		// Zeigt Hashinformationen wie die Verschlüsselungsstärke an
-		print_r (password_get_info($hash));
+		return password_get_info($hash);
 
-	} // End hashInfo
+	}
 
 
-} // End Cryptlib
+}

@@ -4,15 +4,15 @@
  * Library for Sanitization of Data
  */
 
-namespace flundr\core;
+namespace flundr\security;
 
-class saniLib
+class Sanitize
 {
 	/**
 	 * Clean up Post or Get Data Arrays containing e.g. HTML <>
 	 * Inputnames / Getkeys are cleaned too!
 	 */
-	public static function sanitizeData(array $data, $args=null) {
+	public static function mass_input(array $data) {
 
 		if (empty($data)) {return false;}
 

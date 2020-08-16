@@ -1,8 +1,8 @@
 <?php
 
-namespace flundr\core;
+namespace flundr\message;
 
-class Email
+class BasicPHPEmail
 {
 
 	private $to;

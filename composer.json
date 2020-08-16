@@ -1,12 +1,24 @@
 {
-    "name": "flundr/core",
-    "description": "Core files for a flat PHP MVC Framework",
+    "name": "tubsn/flundrcore",
+    "description": "Core files for the flundr PHP MVC Framework",
+    "type": "library",
     "require": {
-        "php": "^7.0"
+        "nikic/fast-route": "^1.3",
+        "phpmailer/phpmailer": "^6.1"
     },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian Butt",
+            "email": "stuff@artmessengers.de"
+        }
+    ],
     "autoload": {
         "psr-4": {
-            "flundr\\core\\": "core/"
-			}
-	}
+            "flundr\\": ""
+            },
+        "files": ["utility/HelperFunctions.php"]
+    },
+
+    "minimum-stability": "stable"
 }
