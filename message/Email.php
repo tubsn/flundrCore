@@ -92,8 +92,7 @@ class Email {
 
 
 		// FIIIIIREEEEEEEEE!!!!!
-		echo $this->mailer->send();
-		die;
+		return $this->mailer->send();
 
 	}
 
