@@ -2,7 +2,7 @@
 
 namespace flundr\core;
 
-use flundr\error\Errorhandler;
+use flundr\error\ErrorHandler;
 use flundr\routing\Router;
 use flundr\auth\LoginHandler;
 use flundr\auth\Auth;
