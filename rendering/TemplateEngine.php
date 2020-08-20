@@ -19,19 +19,23 @@ class TemplateEngine {
 		// Extract Template Variables into the current Scope
 		extract($this->templateData, EXTR_SKIP);
 
-		foreach ($this->templateBlocks as $name => $path) {
+		// Make template Variables available as $tokens
+		$tokens = $this->tokens();
 
-			if (!$path) {continue;}
+		foreach ($this->templateBlocks as $currentTemplateName => $templatePath) {
+
+			if (!$templatePath) {continue;}
 
 			// Fixes Forward and Backward Slash issues in Paths
-			$path = str_replace("/", DIRECTORY_SEPARATOR, $path);
+			$templatePath = str_replace("/", DIRECTORY_SEPARATOR, $templatePath);
 
-			$templatePath = TEMPLATES . $path . TEMPLATE_EXTENSION;
-			if (!file_exists($templatePath)) {
-				echo "\n<pre><mark>Warning: ". ucwords($name) . "-Template not found: ". $templatePath. "</mark></pre>\n";
+			$fullTemplatePath = TEMPLATES . $templatePath . TEMPLATE_EXTENSION;
+			if (!file_exists($fullTemplatePath)) {
+				echo "\n<pre><mark>Warning: ". ucwords($currentTemplateName) . "-Template not found: ". $fullTemplatePath. "</mark></pre>\n";
 				continue;
 			}
-			require $templatePath;
+
+			require $fullTemplatePath;
 		}
 
 	}
