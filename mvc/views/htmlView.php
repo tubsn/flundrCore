@@ -8,8 +8,8 @@ use \flundr\mvc\ViewInterface;
 
 abstract class htmlView implements ViewInterface {
 
-	public $title = APP_NAME;
-	public $description = APP_DESCRIPTION;
+	public $title = null;
+	public $description = null;
 	public $css = null;
 	public $fonts = null;
 	public $meta = null;
