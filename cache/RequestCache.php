@@ -39,6 +39,13 @@ class RequestCache
 		file_put_contents($cacheFile, serialize($data));
 	}
 
+	public function flush() {
+		$files = glob($this->cacheDirectory . DIRECTORY_SEPARATOR . '*');
+		foreach($files as $file){
+		  if(is_file($file))
+		    unlink($file);
+		}
+	}
 
 	private function cache_is_valid($filepath, $expireTime) {
 		if (file_exists($filepath) && (time() - $expireTime < filemtime($filepath))) {
