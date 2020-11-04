@@ -33,4 +33,10 @@ class csvView implements ViewInterface {
 		header("Location:" . $url, true, $code); exit;
 	}
 
+	// Json Export
+	public function json($templateData) {
+		header("Content-type: application/json; charset=utf-8");
+		echo json_encode($templateData);
+	}
+
 }

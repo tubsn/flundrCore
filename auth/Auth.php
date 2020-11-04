@@ -61,7 +61,7 @@ class Auth
 	public static function has_group($groups) {
 		return self::has_feature($groups, 'groups');
 	}
-	
+
 	// added for easier syntax
 	public static function has_rights($rights) {
 		return self::has_feature($rights, 'rights');
@@ -73,6 +73,8 @@ class Auth
 
 
 	private static function has_feature($features, $fieldname) {
+
+		if (empty(self::$authUser) || self::$authUser == false) {return false;}
 
 		$userFeatures = array_map('trim', explode(',', self::$authUser[$fieldname]));
 		$features = array_map('trim', explode(',', $features));
