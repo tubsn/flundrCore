@@ -99,7 +99,7 @@ class SQLdb implements Database
 
 	private function read_multiple_records(array $ids) {
 
-		$listOfIds = implode(',',array_map('intval', $ids)); // Intval for all IDs
+		$listOfIds = implode(',', array_map('intval', $ids)); // Intval for all IDs
 
 		$SQLstatement = $this->connection->prepare(
 			"SELECT ".$this->columns()."
@@ -116,7 +116,7 @@ class SQLdb implements Database
 	public function search($term, $columns) {
 
 		if (is_array($columns)) {
-			$columns = implode($columns, ', ');
+			$columns = implode(', ', $columns);
 			$SQLstatement = $this->connection->prepare(
 				"SELECT ".$this->columns()."
 				 FROM `$this->table`
@@ -226,7 +226,7 @@ class SQLdb implements Database
 	}
 
 	private function columns() {
-		if (is_array($this->columns)) {	return implode($this->columns,','); }
+		if (is_array($this->columns)) {	return implode(',', $this->columns); }
 		if (empty($this->columns) || $this->columns == '*') {return '*';}
 
 		return $this->columns;
