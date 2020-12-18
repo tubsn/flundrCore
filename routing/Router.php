@@ -31,7 +31,7 @@ class Router {
 		        break;
 		    case Dispatcher::METHOD_NOT_ALLOWED:
 		        $allowedMethods = $routeInfo[1]; // Fastroute Allowed Methods
-				throw new \Exception('Error Request Method not allowed.<br/>Allowed Methods: '. implode($allowedMethods,' | '), 405);
+				throw new \Exception('Error Request Method not allowed.<br/>Allowed Methods: '. implode(' | ', $allowedMethods), 405);
 		        break;
 		    case Dispatcher::FOUND:
 			 	// Fastroute 1 = Handler, 2 = Paramters

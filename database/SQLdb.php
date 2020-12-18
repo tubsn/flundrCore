@@ -253,8 +253,13 @@ class SQLdb implements Database
 
 
 	public function delete($id) {
-		$id = intval($id);
-		return $this->connection->exec("DELETE FROM `$this->table` WHERE `$this->primaryIndex` = $id");
+		$SQLstatement = $this->connection->prepare(
+			"DELETE FROM `$this->table`
+			 WHERE `$this->primaryIndex` = :ID"
+		);
+
+		$SQLstatement->execute([':ID' => $id]);
+		return $SQLstatement->rowCount();
 	}
 
 

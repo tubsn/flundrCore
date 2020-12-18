@@ -62,7 +62,7 @@ class LoginHandler
 		if (!$user) {return false;}
 
 		$this->push_to_auth_handler($user);
-
+		$this->persistentCookie->remember_login_for($user['id']);
 	}
 
 	public function logout() {
