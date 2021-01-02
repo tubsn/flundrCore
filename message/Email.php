@@ -2,6 +2,7 @@
 
 namespace flundr\message;
 
+use flundr\utility\Log;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -43,9 +44,10 @@ class Email {
 
 		try {
 			$this->sendWithPHPMailer();
-
+			
 		} catch (\Exception $e) {
-			dd($e);
+			Log::error('Mailer - ' . $e->getMessage());
+			if (!ENV_PRODUCTION) { dd('Mailer - ' . $e->getMessage()); }
 		}
 
 	}
