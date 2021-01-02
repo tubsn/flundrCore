@@ -44,14 +44,13 @@ class Email {
 
 		try {
 			$this->sendWithPHPMailer();
-			
+
 		} catch (\Exception $e) {
 			Log::error('Mailer - ' . $e->getMessage());
 			if (!ENV_PRODUCTION) { dd('Mailer - ' . $e->getMessage()); }
 		}
 
 	}
-
 
 	private function sendWithPHPMailer() {
 
