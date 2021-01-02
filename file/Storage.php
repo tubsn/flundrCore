@@ -15,8 +15,8 @@ class Storage {
 	public $seedFilenames = true;
 
 	public $thumbnails = false;
-	public $thumbWidth = 480;
-	public $thumbHeight = 360;
+	public $thumbWidth = 426;
+	public $thumbHeight = 240;
 	public $thumbQuality = 75;
 	public $thumbFolder = null;
 	public $thumbSuffix = null;
@@ -68,7 +68,7 @@ class Storage {
 			$thumbnailURL = $thumb->create($this->absolute_disk_path($file));
 
 			if ($thumbnailURL) {
-				$thumbnailURL = $this->folder . $thumbnailURL;
+				$thumbnailURL = '/' . $this->folder . $thumbnailURL;
 				$this->storedFiles[$key]['thumbnail'] = $thumbnailURL;
 			}
 

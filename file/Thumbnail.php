@@ -6,8 +6,8 @@ use Intervention\Image\ImageManager;
 
 class Thumbnail {
 
-	public $width = 480;
-	public $height = 360;
+	public $width = 426;
+	public $height = 240;
 	public $quality = 75;
 	public $format = 'jpg';
 	public $subfolder = null;
