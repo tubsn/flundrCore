@@ -10,7 +10,7 @@ class Storage {
 	public $folder = 'uploads';					// Subfolder in the PUBLIC Folder
 	public $uploadContainerName = 'uploads';	// HTML Form Input Container Name
 	public $formats = ['jpg','jpeg','gif','png','webp'];
-	public $maxSize = 25 * 1024 * 1024; // 25mb
+	public $maxSize = 50 * 1024 * 1024; // 50mb
 	public $maxFiles = 10;
 	public $seedFilenames = true;
 

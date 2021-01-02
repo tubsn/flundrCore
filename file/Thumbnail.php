@@ -62,7 +62,7 @@ class Thumbnail {
 
 		if ($this->subfolder) {
 			$path = $path . $this->subfolder . DIRECTORY_SEPARATOR;
-			$this->outputURL = '/' . $this->subfolder;
+			$this->subfolder = '/' . $this->subfolder;
 		}
 
 		if (!is_dir($path)) {mkdir($path);}
@@ -70,7 +70,7 @@ class Thumbnail {
 		$filename = $this->sanitize($filename);
 
 		$this->outputPath = $path . $filename;
-		$this->outputURL .= '/' . $filename;
+		$this->outputURL = $this->subfolder . '/' . $filename;
 
 	}
 
