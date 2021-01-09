@@ -21,7 +21,8 @@ class Log
 		$logEntry = $time . " " . $data . "\n";
 
 		$directory = LOGS . 'error';
-		if (!is_dir($directory)) {mkdir($directory);}
+
+		if (!is_dir($directory)) {mkdir($directory, 0777, true);}
 		$filename = $day.'.log';
 		$path = $directory . DIRECTORY_SEPARATOR . $filename;
 
