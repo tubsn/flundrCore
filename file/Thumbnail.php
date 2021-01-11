@@ -6,8 +6,8 @@ use Intervention\Image\ImageManager;
 
 class Thumbnail {
 
-	public $width = 426;
-	public $height = 240;
+	public $width = 480;
+	public $height = 360;
 	public $quality = 75;
 	public $format = 'jpg';
 	public $subfolder = null;
@@ -62,7 +62,7 @@ class Thumbnail {
 
 		if ($this->subfolder) {
 			$path = $path . $this->subfolder . DIRECTORY_SEPARATOR;
-			$this->subfolder = '/' . $this->subfolder;
+			$this->outputURL = '/' . $this->subfolder;
 		}
 
 		if (!is_dir($path)) {mkdir($path);}
@@ -70,7 +70,7 @@ class Thumbnail {
 		$filename = $this->sanitize($filename);
 
 		$this->outputPath = $path . $filename;
-		$this->outputURL = $this->subfolder . '/' . $filename;
+		$this->outputURL .= '/' . $filename;
 
 	}
 

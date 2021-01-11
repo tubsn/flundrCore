@@ -10,13 +10,13 @@ class Storage {
 	public $folder = 'uploads';					// Subfolder in the PUBLIC Folder
 	public $uploadContainerName = 'uploads';	// HTML Form Input Container Name
 	public $formats = ['jpg','jpeg','gif','png','webp'];
-	public $maxSize = 50 * 1024 * 1024; // 50mb
+	public $maxSize = 25 * 1024 * 1024; // 25mb
 	public $maxFiles = 10;
 	public $seedFilenames = true;
 
 	public $thumbnails = false;
-	public $thumbWidth = 426;
-	public $thumbHeight = 240;
+	public $thumbWidth = 480;
+	public $thumbHeight = 360;
 	public $thumbQuality = 75;
 	public $thumbFolder = null;
 	public $thumbSuffix = null;
@@ -68,7 +68,7 @@ class Storage {
 			$thumbnailURL = $thumb->create($this->absolute_disk_path($file));
 
 			if ($thumbnailURL) {
-				$thumbnailURL = '/' . $this->folder . $thumbnailURL;
+				$thumbnailURL = $this->folder . $thumbnailURL;
 				$this->storedFiles[$key]['thumbnail'] = $thumbnailURL;
 			}
 

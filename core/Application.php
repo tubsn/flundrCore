@@ -46,7 +46,10 @@ class Application {
 		Auth::checkin(Session::get('authUser'));
 		if (Auth::logged_in()) {return;}
 
-		if (isset($_COOKIE[LOGINCOOKIE_NAME])) {
+		if (defined('LOGINCOOKIE_NAME')) {$cookieName = LOGINCOOKIE_NAME;}
+		else {$cookieName = 'auth';}
+
+		if (isset($_COOKIE[$cookieName])) {
 			$loginHandler = new LoginHandler();
 			$loginHandler->login_by_cookie();
 			unset($loginHandler);

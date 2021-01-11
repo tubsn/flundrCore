@@ -6,6 +6,7 @@ use \flundr\database\SQLdb;
 use \flundr\utility\Session;
 use \flundr\auth\Auth;
 use \flundr\auth\PersistentCookie;
+use \flundr\auth\AuthRecorder;
 
 class LoginHandler
 {
@@ -27,16 +28,15 @@ class LoginHandler
 
 		$user = $this->get_user_by_mail($userLogin);
 
-		if (!$user) {
-			throw new \Exception("Login Failed: Wrong Password or Username");
-			return false;
-		}
+		$recorder = new AuthRecorder($user['id']);
 
 		if (!password_verify($userPW, $user['password'])) {
-			throw new \Exception("Login Failed: Wrong Password or Username");
+			$recorder->prevent_brute_force();
+			throw new \Exception("Login Failed: wrong Password");
 			return false;
 		}
 
+		$recorder->login_successful();
 		$this->push_to_auth_handler($user);
 		$this->persistentCookie->remember_login_for($user['id']);
 
@@ -62,16 +62,25 @@ class LoginHandler
 		if (!$user) {return false;}
 
 		$this->push_to_auth_handler($user);
-		$this->persistentCookie->remember_login_for($user['id']);
+
+		// Do we need a new Cookie?
+		//$this->persistentCookie->remember_login_for($user['id']);
 	}
 
 	public function logout() {
 
-		$this->persistentCookie->invalidate(Auth::get('id'));
+		$this->persistentCookie->invalidate_cookie();
 		Auth::checkout();
 		Session::delete('authUser');
 
 		return true;
+	}
+
+	public function list_logins() {
+
+		$recorder = new AuthRecorder(Auth::get('id'));
+		return $recorder->list();
+
 	}
 
 	public function profile() {
@@ -86,9 +95,10 @@ class LoginHandler
 
 		$userID = Auth::get('id');
 
-		// Delete all Persistent Logins if User changes Password
+		// Delete all Persistent Logins and create new one if User changes Password
 		if (isset($userData['password']) || isset($userData['passwort'])) {
-			$this->persistentCookie->invalidate($userID);
+			$this->persistentCookie->invalidate_all_tokens($userID);
+			$this->persistentCookie->remember_login_for($userID);
 		}
 
 		$this->userDB->protected = ['level']; // the User Level should not be Changeable
@@ -104,7 +114,6 @@ class LoginHandler
 		return false;
 	}
 
-
 	private function get_user_by_mail($email) {
 
 		$userData = $this->userDB->exact_search($email, 'email');
@@ -112,7 +121,8 @@ class LoginHandler
 			return $userData[0]; // there "Should" by only one User... :)
 		}
 
-		return null;
+		throw new \Exception("Login Failed: User not Found");
+
 	}
 
 	private function push_to_auth_handler($user) {

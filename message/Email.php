@@ -36,9 +36,8 @@ class Email {
 			extract($this->data, EXTR_OVERWRITE);
 		}
 
-		// Process Template into variable
 		ob_start();
-			require(TEMPLATES . $bodyTemplate . TEMPLATE_EXTENSION);
+			include(tpl($bodyTemplate));
 			$this->mailbody = ob_get_contents();
 		ob_end_clean();
 

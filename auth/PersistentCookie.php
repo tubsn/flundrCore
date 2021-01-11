@@ -9,7 +9,7 @@ class PersistentCookie
 {
 
 	private $db;
-	private $cookieName = LOGINCOOKIE_NAME;
+	private $cookieName = 'auth';
 	private $cookieExpire = '+30 Days';
 
 	function __construct() {
@@ -19,8 +19,9 @@ class PersistentCookie
 		if (defined('TABLE_AUTHTOKENS')) {$this->db->table = TABLE_AUTHTOKENS;}
 		else {$this->db->table = 'authtokens';}
 
-		$this->db->index = 'userid'; // Auth Table is using this as the Primary Index
+		$this->db->primaryIndex = 'userid'; // Auth Table is using this as the Primary Index
 
+		if (defined('LOGINCOOKIE_NAME')) {$this->cookieName = LOGINCOOKIE_NAME;}
 		if (defined('LOGINCOOKIE_EXPIRE')) {$this->cookieExpire = LOGINCOOKIE_EXPIRE;}
 	}
 
@@ -29,8 +30,6 @@ class PersistentCookie
 		$userID = $this->validate_cookie($this->cookieName);
 		if (!$userID) {return false;}
 
-		// remove old Logincookies and Auth Tokens and set new ones
-		$this->invalidate($userID);
 		$this->remember_login_for($userID);
 
 		return $userID;
@@ -50,7 +49,7 @@ class PersistentCookie
 		// Database Entry with hashed Token
 		$this->db->create([
 			'selector' => $selector,
-			'hashedValidator' => hash('sha256', $randomToken ),
+			'hashed_validator' => hash('sha256', $randomToken ),
 			'userid' => $userID,
 			'expires' => $DBExpireTime
 		]);
@@ -74,20 +73,21 @@ class PersistentCookie
 
 		// Stored AuthToken is hashed so we need to hash the Users Cookie too
 		$hashedCookieToken = hash('sha256', $loginCookie['token']);
-		if (!hash_equals($authToken['hashedValidator'], $hashedCookieToken)) { return false; }
+		if (!hash_equals($authToken['hashed_validator'], $hashedCookieToken)) { return false; }
 
 		return $authToken['userid'];
 	}
 
 	private function get_token_from_authDB($selectorID) {
 		$this->db->primaryIndex = 'selector';
+
 		$authToken = $this->db->read($selectorID);
+		$this->invalidate_token($selectorID); // Tokens are one time use only
 
 		if (empty($authToken) || $this->is_token_expired($authToken['expires'])) { return false; }
 
 		return $authToken;
 	}
-
 
 	private function is_token_expired($timestamp) {
 		$expireDate = new \dateTime($timestamp);
@@ -96,10 +96,24 @@ class PersistentCookie
 		return false;
 	}
 
+	public function invalidate_cookie() {
+		$loginCookie = $this->read_user_cookie($this->cookieName);
+		$this->invalidate_token($loginCookie['selectorID']);
+	}
 
-	public function invalidate($userID) {
-		if ($userID) {$this->db->delete($userID);}
+	public function delete_cookie() {
 		setcookie($this->cookieName, null, -1, '/');
+	}
+
+	public function invalidate_token($selectorID) {
+		if ($selectorID) {
+			$this->db->primaryIndex = 'selector';
+			$this->db->delete($selectorID);
+		}
+	}
+
+	public function invalidate_all_tokens($userID) {
+		if ($userID) {$this->db->delete($userID);}
 	}
 
 	private function read_user_cookie($cookieName) {
@@ -110,6 +124,23 @@ class PersistentCookie
 					'token' => $cookieContent[1]];
 		}
 		return false;
+	}
+
+	public function create_table() {
+
+		$tablename = $this->db->table;
+
+		$this->db->query(
+			"CREATE TABLE IF NOT EXISTS `$tablename` (
+				`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+				`selector` char(20) NOT NULL,
+				`hashed_validator` char(64) NOT NULL,
+				`userid` int(101) NOT NULL,
+				`expires` datetime NOT NULL,
+				PRIMARY KEY (`id`)
+			) ENGINE=InnoDB AUTO_INCREMENT=16829 DEFAULT CHARSET=utf8mb4"
+		);
+
 	}
 
 }

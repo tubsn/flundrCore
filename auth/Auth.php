@@ -9,9 +9,7 @@ class Auth
 {
 
 	private static $authUser = null;
-
 	public static $loginPageUrl = '/login';
-	public static $allowedIPs = ALLOWED_IPS;
 
 	// User Status
 	private static $loggedIn = false;
@@ -93,8 +91,13 @@ class Auth
 		}
 	}
 
+	private static function allowed_ips() {
+		if (defined('ALLOWED_IPS')) {return ALLOWED_IPS;}
+		return [];
+	}
+
 	private static function check_for_allowed_ip() {
-		if (in_array($_SERVER['REMOTE_ADDR'], self::$allowedIPs)) {
+		if (in_array($_SERVER['REMOTE_ADDR'], self::allowed_ips())) {
 			self::$validIP = true;
 		}
 	}
