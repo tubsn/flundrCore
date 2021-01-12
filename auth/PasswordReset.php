@@ -102,7 +102,7 @@ class PasswordReset
 		// Database Entry with hashed Token
 		$this->authDB->create([
 			'selector' => $selector,
-			'hashedValidator' => hash('sha256', $randomToken ),
+			'hashed_validator' => hash('sha256', $randomToken ),
 			'userid' => $userID,
 			'expires' => $DBExpireTime
 		]);
@@ -142,7 +142,7 @@ class PasswordReset
 
 		$authToken = $this->get_token_from_authDB($selectorID);
 
-		if (!hash_equals($authToken['hashedValidator'], $hashedUserToken)) {
+		if (!hash_equals($authToken['hashed_validator'], $hashedUserToken)) {
 			throw new \Exception("Reset Token did not match", 403);
 		}
 
