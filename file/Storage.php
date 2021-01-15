@@ -68,7 +68,7 @@ class Storage {
 			$thumbnailURL = $thumb->create($this->absolute_disk_path($file));
 
 			if ($thumbnailURL) {
-				$thumbnailURL = $this->folder . $thumbnailURL;
+				$thumbnailURL = '/' . $this->folder . $thumbnailURL;
 				$this->storedFiles[$key]['thumbnail'] = $thumbnailURL;
 			}
 
