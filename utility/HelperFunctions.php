@@ -46,8 +46,15 @@ function formatDate($date, $format='Y-m-d') {
 	return $date->format($format);
 }
 
-function explode_and_trim($string, $delimiter) {
+function explode_and_trim($delimiter, $string) {
 	return array_map('trim', explode($delimiter, $string));
+}
+
+function remove_from_list($id, $list) {
+	$elements = explode_and_trim(',' , $list);
+	$key = array_search($id, $elements);
+	unset($elements[$key]);
+	return implode(',', $elements);
 }
 
 // Shorthand for wanted HTTP Errors
