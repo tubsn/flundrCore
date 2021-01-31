@@ -16,6 +16,10 @@ class LoginHandler
 
 	function __construct() {
 
+		if (!defined('USER_DB_SETTINGS')) {
+			throw new \Exception("UserDB Config not found. Please check your .env File", 500);
+		}			
+		
 		$this->userDB = new SQLdb(USER_DB_SETTINGS);
 
 		if (defined('TABLE_USERS')) {$this->userDB->table = TABLE_USERS;}
