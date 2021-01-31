@@ -17,8 +17,8 @@ class AuthRecorder
 	function __construct($userID) {
 
 		$this->db = new SQLdb(USER_DB_SETTINGS);
-		if (defined('TABLE_THROTTLE')) {
-			$this->db->table = TABLE_THROTTLE;
+		if (defined('TABLE_AUTHLOGS')) {
+			$this->db->table = TABLE_AUTHLOGS;
 		}
 		else {$this->db->table = $this->table;}
 
@@ -104,22 +104,6 @@ class AuthRecorder
 
 		$SQLstatement->execute([':userID' => $this->userID]);
 		return $SQLstatement->fetchall();
-
-	}
-
-	public function create_table() {
-
-		$this->db->query(
-			"CREATE TABLE IF NOT EXISTS `$this->table` (
-				`id` int(11) NOT NULL,
-				`date` datetime NOT NULL DEFAULT current_timestamp(),
-				`ip` varchar(39) NOT NULL,
-				`userinfo` varchar(255) DEFAULT NULL,
-				`success` tinyint(1) DEFAULT NULL,
-				KEY `id` (`id`),
-				KEY `success` (`success`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
-		);
 
 	}
 

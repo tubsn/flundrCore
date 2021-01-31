@@ -205,7 +205,7 @@ class SQLdb implements Database
 		}
 
 		if (empty($fieldNames)) {return null;}
-		
+
 		$fieldNames= rtrim($fieldNames, ', '); // Remove excess , in $fieldNames
 		$valueNames= rtrim($valueNames, ', '); // Remove excess , in $valueNames
 		$updateFields= rtrim($updateFields, ', '); // Remove excess , in $updateFields
@@ -270,9 +270,9 @@ class SQLdb implements Database
 		// Sanitize Data, Hash Passwords and Pre-Format for PDO->prepare
 		$record = $this->remove_fields($record, $this->protected);
 		$record = $this->prepare_for_mass_insertion($record);
-		
+
 		if (empty($record)) {return null;}
-		
+
 		// Add the Target RowID to the PDO Query
 		$record['values'][':RowID'] = $id;
 
@@ -285,6 +285,7 @@ class SQLdb implements Database
 			$stmt->execute($record['values']);
 
 			return $stmt->rowCount(); // Returns true if something got changed
+
 		}
 		catch(\PDOException $e) {
 			die ($e->getMessage()); // die on error

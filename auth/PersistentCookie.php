@@ -126,21 +126,4 @@ class PersistentCookie
 		return false;
 	}
 
-	public function create_table() {
-
-		$tablename = $this->db->table;
-
-		$this->db->query(
-			"CREATE TABLE IF NOT EXISTS `$tablename` (
-				`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-				`selector` char(20) NOT NULL,
-				`hashed_validator` char(64) NOT NULL,
-				`userid` int(101) NOT NULL,
-				`expires` datetime NOT NULL,
-				PRIMARY KEY (`id`)
-			) ENGINE=InnoDB AUTO_INCREMENT=16829 DEFAULT CHARSET=utf8mb4"
-		);
-
-	}
-
 }

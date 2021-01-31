@@ -103,7 +103,16 @@ class LoginHandler
 
 		$this->userDB->protected = ['level']; // the User Level should not be Changeable
 
-		$updateWorked = $this->userDB->update($userData, $userID);
+		try {
+
+			$updateWorked = $this->userDB->update($userData, $userID);
+
+		} catch (\Exception $e) {
+
+			dd($e);
+
+		}
+
 		$newUser = $this->userDB->read($userID);
 
 		if ($updateWorked && $newUser) {

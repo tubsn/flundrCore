@@ -39,4 +39,3 @@ class Sanitize
 
 	} // End Sanitize Data
 }
-?>
