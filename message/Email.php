@@ -21,6 +21,7 @@ class Email {
 	function __construct() {
 		if (defined('MAIL_SENDER_ADDRESS')) {$this->from = MAIL_SENDER_ADDRESS;}
 		if (defined('MAIL_SENDER_NAME')) {$this->fromName = MAIL_SENDER_NAME;}
+		if (defined('MAIL_DISABLE_AUTH')) {$this->disableAuth = MAIL_DISABLE_AUTH;}		
 	}
 
 	public function send($bodyTemplate, array $templateData = []) {
@@ -55,15 +56,22 @@ class Email {
 
 		$this->mailer = new PHPMailer(true); // Passing `true` enables exceptions
 
-	    $this->mailer->isSMTP();							// Set mailer to use SMTP
-	    $this->mailer->Host = MAIL_SERVER;					// Specify main and backup SMTP servers
-	    $this->mailer->SMTPAuth = true;						// Enable SMTP authentication
-	    $this->mailer->Username = MAIL_USERNAME;			// SMTP username
-	    $this->mailer->Password = MAIL_PW;					// SMTP password
-	    $this->mailer->SMTPSecure = 'ssl';					// Enable TLS encryption, `ssl` also accepted
-	    $this->mailer->Port = 465;							// TCP port to connect to
+		$this->mailer->isSMTP();							// Set mailer to use SMTP
+		$this->mailer->Host = MAIL_SERVER;					// Specify main and backup SMTP servers
+		$this->mailer->SMTPAuth = true;						// Enable SMTP authentication
+		$this->mailer->Username = MAIL_USERNAME;			// SMTP username
+		$this->mailer->Password = MAIL_PW;					// SMTP password
+		$this->mailer->SMTPSecure = 'ssl';					// Enable TLS encryption, `ssl` also accepted
+		$this->mailer->Port = 465;							// TCP port to connect to
 		$this->mailer->isHTML(true);						// Set email format to HTML
 		$this->mailer->CharSet = 'UTF-8';
+
+		if ($this->disableAuth) {
+			$this->mailer->SMTPAuth = false;			
+			$this->mailer->SMTPSecure = false;
+			$this->mailer->SMTPAutoTLS = false;
+			$this->mailer->Port = 25;
+		}
 
 		$this->mailer->setFrom($this->from, $this->fromName);
 		$this->mailer->Subject = $this->subject;
