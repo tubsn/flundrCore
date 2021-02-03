@@ -15,7 +15,9 @@ class PasswordReset
 	private $resetExpire = '+1 Minutes';
 	public $mailTemplate = 'email/reset_pw_email';
 	public $mailSubject = 'Password reset requested';
-
+	public $mailFrom = 'no-reply@flundr.de';
+	public $mailFromName = 'Flundr Login';
+	
 	function __construct() {
 
 		$this->authDB = new SQLdb(USER_DB_SETTINGS);
@@ -81,6 +83,8 @@ class PasswordReset
 
 		$resetMail = new Email();
 		$resetMail->subject = $this->mailSubject;
+		$resetMail->from = $this->mailFrom;
+		$resetMail->fromName = $this->mailFromName;
 		$resetMail->to = [$targetEmail];
 
 		if ($this->mailTemplate) {
