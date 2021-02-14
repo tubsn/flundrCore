@@ -6,6 +6,7 @@ use \flundr\database\SQLdb;
 use \flundr\security\CryptLib;
 use \flundr\message\Email;
 use \flundr\auth\LoginHandler;
+use \flundr\auth\AuthRecorder;
 
 class PasswordReset
 {
@@ -63,6 +64,9 @@ class PasswordReset
 		$loginHandler = new LoginHandler();
 		$loginHandler->login_by_id($userID);
 
+		$recorder = new AuthRecorder($userID);
+		$recorder->login_successful();
+		
 		$this->invalidate_token($authToken['selector']);
 
 		return true;
