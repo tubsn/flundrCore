@@ -17,6 +17,7 @@ class Email {
 	public $cc;
 	public $bcc;
 	private $mailbody;
+	private $disableAuth;
 
 	function __construct() {
 		if (defined('MAIL_SENDER_ADDRESS')) {$this->from = MAIL_SENDER_ADDRESS;}
