@@ -28,9 +28,11 @@ class PasswordReset
 		$this->userDB = new SQLdb(USER_DB_SETTINGS);
 		if (defined('TABLE_USERS')) {$this->userDB->table = TABLE_USERS;}
 		else {$this->userDB->table = 'users';}
+		
+		if (defined('MAIL_SENDER_ADDRESS')) {$this->mailFrom = MAIL_SENDER_ADDRESS;}
+		if (defined('MAIL_SENDER_NAME')) {$this->mailFromName = MAIL_SENDER_NAME;}
 
 	}
-
 
 	public function by_email($email) {
 
