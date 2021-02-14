@@ -73,7 +73,6 @@ class SQLdb implements Database
 	}
 
 	public function read_all() {
-		$selectedColumns = $this->columns();
 		$SQLstatement = $this->connection->prepare(
 			"SELECT ".$this->columns()."
 			 FROM `$this->table`
