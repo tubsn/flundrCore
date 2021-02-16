@@ -44,7 +44,7 @@ class BasicPHPEmail
 	private function validateEmail($emailArray) {
 
 		$filteredMailArray = filter_var_array($emailArray, FILTER_VALIDATE_EMAIL);
-		return implode($filteredMailArray, ',');
+		return implode(',', $filteredMailArray);
 
 	}
 
