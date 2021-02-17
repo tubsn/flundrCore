@@ -20,7 +20,7 @@ class Session
 	public static function get($key) {
 		if (isset($_SESSION[$key])) {
 			return $_SESSION[$key];
-		} else {return false;}
+		} else {return null;}
 	}
 
 	// Read Whole Session
