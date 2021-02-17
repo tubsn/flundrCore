@@ -81,6 +81,13 @@ function consume_flash() {
 	}
 }
 
+function empty_to_null($array) {
+	$array = array_map(function($value){
+		return (empty($value)) ? null : $value;
+	},$array);
+	return $array;
+}
+
 function session($var) {
 	return \flundr\utility\Session::get($var);
 }
