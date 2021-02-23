@@ -11,7 +11,6 @@ class AuthInstall
 	private $authTokenTable = 'authtokens';
 	private $userTable = 'users';
 
-
 	function __construct() {
 
 		$this->db = new SQLdb(USER_DB_SETTINGS);
@@ -59,14 +58,14 @@ class AuthInstall
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS `$this->userTable` (
 			 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			 `edited` timestamp NOT NULL DEFAULT current_timestamp(),
+			 `edited` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 			 `created` timestamp NOT NULL DEFAULT current_timestamp(),
 			 `username` varchar(60) DEFAULT NULL,
 			 `password` varchar(120) NOT NULL,
 			 `firstname` varchar(120) DEFAULT NULL,
 			 `lastname` varchar(120) DEFAULT NULL,
 			 `email` varchar(120) NOT NULL,
-			 `groups` varchar(255) DEFAULT NULL,
+			 `groups` varchar(120) DEFAULT NULL,
 			 `level` enum('User','Admin') DEFAULT NULL,
 			 `rights` varchar(120) DEFAULT NULL,
 			 PRIMARY KEY (`id`),
@@ -97,7 +96,7 @@ class AuthInstall
 
 		$this->db->query(
 			"CREATE TABLE IF NOT EXISTS `$this->authTokenTable` (
-				`userid` int(101) NOT NULL,
+				`userid` int(11) NOT NULL,
 				`selector` char(20) NOT NULL,
 				`hashed_validator` char(64) NOT NULL,
 				`expires` datetime NOT NULL

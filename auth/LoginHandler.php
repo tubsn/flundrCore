@@ -11,6 +11,8 @@ use \flundr\auth\AuthRecorder;
 class LoginHandler
 {
 
+	public $protectedFields = ['level', 'group', 'rights']; // User can't change these
+
 	private $userDB;
 	private $persistentCookie;
 
@@ -18,8 +20,8 @@ class LoginHandler
 
 		if (!defined('USER_DB_SETTINGS')) {
 			throw new \Exception("UserDB Config not found. Please check your .env File", 500);
-		}			
-		
+		}
+
 		$this->userDB = new SQLdb(USER_DB_SETTINGS);
 
 		if (defined('TABLE_USERS')) {$this->userDB->table = TABLE_USERS;}
@@ -99,23 +101,21 @@ class LoginHandler
 
 		$userID = Auth::get('id');
 
+		// Prevents User from changing Fields he should not
+		$this->userDB->protected = $this->protectedFields;
+
+		// User can't have empty password
+		if (empty($userData['password'])) {unset($userData['password']);}
+		if (empty($userData['passwort'])) {unset($userData['passwort']);}
+
 		// Delete all Persistent Logins and create new one if User changes Password
 		if (isset($userData['password']) || isset($userData['passwort'])) {
 			$this->persistentCookie->invalidate_all_tokens($userID);
 			$this->persistentCookie->remember_login_for($userID);
 		}
 
-		$this->userDB->protected = ['level']; // the User Level should not be Changeable
-
-		try {
-
-			$updateWorked = $this->userDB->update($userData, $userID);
-
-		} catch (\Exception $e) {
-
-			dd($e);
-
-		}
+		try { $updateWorked = $this->userDB->update($userData, $userID);}
+		catch (\Exception $e) {	dd($e); }
 
 		$newUser = $this->userDB->read($userID);
 
