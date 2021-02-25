@@ -178,23 +178,18 @@ class SQLdb implements Database
 
 		foreach ($data as $fieldName => $value) {
 
-			// Remove CSRF Challange Token from Post Forms
+			// Ignore CSRF Token's and Primary Indexes
 			if (strtolower($fieldName) == 'challange' || strtolower($fieldName) == 'csrftoken' ) {continue;}
-
-			// Remove IDs as long as keep IDs is false
 			if (!$keepIDs && strtolower($fieldName) == $this->primaryIndex) {continue;}
 
-			// Ignore empty Fields "" but not NULL Values
-			if ((empty($value) && !is_null($value)) && ($value !== 0) && ($value !== '0')) {continue;}
-
-			// If Fieldname == Password and not Empty -> hash the Password
+			// Always hash Passwords
 			if (strtolower($fieldName) == 'password' || strtolower($fieldName) == 'passwort') {
 				if (empty($value)) {continue;} // exclude Field if Password is Empty
-				$values[':'.$fieldName] = CryptLib::hash($value); // Hash Password
+				$values[':'.$fieldName] = CryptLib::hash($value);
 			}
-			else {
-				$values[':'.$fieldName] = $value; // Output every other Value
-			}
+
+			// Process general fields
+			else { $values[':'.$fieldName] = $value; }
 
 			// Security Masking the Fieldnames with ` Pairs
 			$fieldNames .= "`".str_replace("`", "``", $fieldName)."`, ";
@@ -236,15 +231,16 @@ class SQLdb implements Database
 
 	public function create($newRecord) {
 
-		// Sanitize Data, Hash Passwords and Pre-Format for PDO->prepare
-		$data = $this->prepare_for_mass_insertion($newRecord, true); // true = keep the Index
+		$data = $this->prepare_for_mass_insertion($newRecord, true); // true = keep the PrimaryIndex
 
 		try {
 			$stmt = $this->connection->prepare(
 				"INSERT INTO `$this->table` (".$data['fieldNames'].") VALUES (".$data['valueNames'].")"
 			);
+
 			$stmt->execute($data['values']);
-			return ($this->connection->lastInsertId()); // Return a New ID on Success
+			return ($this->connection->lastInsertId());
+
 		} catch(\PDOException $e) {
 			die ($e->getMessage()); // die on error
 		}
