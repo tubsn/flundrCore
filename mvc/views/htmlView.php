@@ -52,7 +52,17 @@ abstract class htmlView implements ViewInterface {
 
 	// Helper Function for HTML Redirects
 	public function redirect($url, $code='301') {
+		if (empty($url)) {$url = '/';}
 		header("Location:" . $url, true, $code); exit;
+	}
+
+	public function back() {
+		$this->redirect(Session::get('referer') ?? $_POST['referer'] ?? '/');
+	}
+
+	public function referer($url = null) {
+		if (empty($url)) {return Session::get('referer') ?? $_POST['referer'] ?? '/';}
+		Session::set('referer', $url);
 	}
 
 	// Json Export
@@ -92,4 +102,3 @@ abstract class htmlView implements ViewInterface {
 
 
 }
-

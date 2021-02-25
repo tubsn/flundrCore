@@ -37,6 +37,22 @@ function tpl($templateName) {
 	return TEMPLATES.$templateName.TEMPLATE_EXTENSION;
 }
 
+// Create URL Slugs
+function slugify($urlString) {
+
+	$urlString = preg_replace('~[^\p{L}\d]+~u', '-', $urlString);
+	$urlString = strtolower($urlString);
+
+	$umlaute = [
+		'ä'=>'ae', 'ö'=>'oe', 'ü'=>'ue',
+		'ß'=>'ss', 'æ'=>'ae', 'ø'=>'oe',
+		'å'=>'aa', 'é'=>'e', 'è'=>'e',
+	];
+
+    return str_replace(array_keys($umlaute), array_values($umlaute), $urlString);
+
+}
+
 // Shorthand for Date Transformations
 function formatDate($date, $format='Y-m-d') {
 	if (is_null($date)) {
