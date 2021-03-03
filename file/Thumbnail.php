@@ -60,9 +60,10 @@ class Thumbnail {
 		$filename = $pathInfo['filename'] . $this->suffix . '.' . $this->format;
 		$path = $pathInfo['dirname'] . DIRECTORY_SEPARATOR;
 
+		$subFolderUrl = null;
 		if ($this->subfolder) {
 			$path = $path . $this->subfolder . DIRECTORY_SEPARATOR;
-			$this->outputURL = '/' . $this->subfolder;
+			$subFolderUrl = '/' . $this->subfolder;
 		}
 
 		if (!is_dir($path)) {mkdir($path);}
@@ -70,7 +71,7 @@ class Thumbnail {
 		$filename = $this->sanitize($filename);
 
 		$this->outputPath = $path . $filename;
-		$this->outputURL .= '/' . $filename;
+		$this->outputURL = $subFolderUrl . '/' . $filename;
 
 	}
 
