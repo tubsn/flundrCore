@@ -49,7 +49,8 @@ function slugify($urlString) {
 		'å'=>'aa', 'é'=>'e', 'è'=>'e',
 	];
 
-    return str_replace(array_keys($umlaute), array_values($umlaute), $urlString);
+	$urlstring = str_replace(array_keys($umlaute), array_values($umlaute), $urlString);
+	return trim($urlstring, '-');
 
 }
 
