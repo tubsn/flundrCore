@@ -44,6 +44,8 @@ class PasswordReset
 		$email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
 		$userID = $this->get_userID_by_mail($email);
+		if (empty($userID)) {return;}
+		
 		$resetToken = $this->generate_reset_token($userID);
 		$this->send_reset_token($email, $resetToken);
 
