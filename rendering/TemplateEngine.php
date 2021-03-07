@@ -29,7 +29,9 @@ class TemplateEngine {
 	private function bake_templates() {
 
 		// Extract Template Variables into the current Scope
-		extract($this->templateData, EXTR_SKIP);
+		if ($this->templateData) {
+			extract($this->templateData, EXTR_SKIP);
+		}
 
 		// Make template Variables available as $tokens
 		$tokens = $this->tokens();
