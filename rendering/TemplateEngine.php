@@ -15,6 +15,18 @@ class TemplateEngine {
 	}
 
 	public function render() {
+		echo $this->bake_templates();
+	}
+
+	public function burn() {
+		return $this->bake_templates();
+	}
+
+	public function tokens() {
+		return $this->templateData;
+	}
+
+	private function bake_templates() {
 
 		// Extract Template Variables into the current Scope
 		extract($this->templateData, EXTR_SKIP);
@@ -22,27 +34,33 @@ class TemplateEngine {
 		// Make template Variables available as $tokens
 		$tokens = $this->tokens();
 
+		ob_start();
+
 		foreach ($this->templateBlocks as $currentTemplateName => $templatePath) {
 
 			if (!$templatePath) {continue;}
+			$templatePath = $this->full_path($templatePath);
 
-			// Fixes Forward and Backward Slash issues in Paths
-			$templatePath = str_replace("/", DIRECTORY_SEPARATOR, $templatePath);
-
-			$fullTemplatePath = TEMPLATES . $templatePath . TEMPLATE_EXTENSION;
-			if (!file_exists($fullTemplatePath)) {
-				echo "\n<pre><mark>Warning: ". ucwords($currentTemplateName) . "-Template not found: ". $fullTemplatePath. "</mark></pre>\n";
+			if (!file_exists($templatePath)) {
+				echo "\n<pre><mark>Warning: ". ucwords($currentTemplateName) . "-Template not found: ". $templatePath. "</mark></pre>\n";
 				continue;
 			}
 
-			require $fullTemplatePath;
+			require $templatePath;
+
 		}
+
+		$burnedData = ob_get_contents();
+
+		ob_end_clean();
+
+		return $burnedData;
 
 	}
 
-	public function tokens() {
-		return $this->templateData;
+	private function full_path($path) {
+		$path = str_replace("/", DIRECTORY_SEPARATOR, $path);
+		return TEMPLATES . $path . TEMPLATE_EXTENSION;
 	}
 
 }
-
