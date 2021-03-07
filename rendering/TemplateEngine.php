@@ -9,7 +9,13 @@ class TemplateEngine {
 	private $templateDirectory = TEMPLATES;
 	private $templateExtension = TEMPLATE_EXTENSION;
 
-	public function __construct(array $templateBlocks, array $templateData = null) {
+	public function __construct($templateBlocks, array $templateData = null) {
+
+		// Force Templateblocks into Array if it's only one Template
+		if (!is_array($templateBlocks)) {
+			$templateBlocks = ['main' => $templateBlocks];
+		}
+
 		$this->templateBlocks = $templateBlocks;
 		$this->templateData = $templateData;
 	}
@@ -29,9 +35,7 @@ class TemplateEngine {
 	private function bake_templates() {
 
 		// Extract Template Variables into the current Scope
-		if ($this->templateData) {
-			extract($this->templateData, EXTR_SKIP);
-		}
+		if ($this->templateData) { extract($this->templateData, EXTR_SKIP); }
 
 		// Make template Variables available as $tokens
 		$tokens = $this->tokens();
