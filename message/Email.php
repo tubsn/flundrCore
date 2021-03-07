@@ -3,107 +3,134 @@
 namespace flundr\message;
 
 use flundr\utility\Log;
+use flundr\rendering\TemplateEngine;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 class Email {
 
-	private $mailer;
+	private $mailservice;
 
-	public $subject = 'Flundr Testmail';
+	public $subject = 'Infomail';
 	public $from = 'mail@flundr.com';
 	public $fromName = 'Flundr';
 	public $to;
 	public $cc;
 	public $bcc;
-	private $mailbody;
-	private $disableAuth;
+
+	public $files;
+	public $template;
+	public $templateData;
 
 	function __construct() {
+		$this->setup_service();
+	}
+
+	public function send($template = null, $templateData = null) {
+
+		if ($template) { $this->template = $template; }
+		if ($templateData) { $this->templateData = $templateData; }
+
+		$this->setup_sender();
+		$this->setup_recipients();
+		$this->setup_content();
+		$this->setup_attachments();
+
+		$this->mailservice->send();
+
+		$this->create_log();
+
+	}
+
+	// Syntax alternative to send()
+	public function render($template = null, $templateData = null) {
+		$this->send($template, $templateData);
+	}
+
+	private function create_log() {
+
+		$error = $this->mailservice->ErrorInfo;
+		if ($error) { Log::error('Mailer - ' . $error); return;}
+
+	}
+
+	private function setup_sender() {
 		if (defined('MAIL_SENDER_ADDRESS')) {$this->from = MAIL_SENDER_ADDRESS;}
 		if (defined('MAIL_SENDER_NAME')) {$this->fromName = MAIL_SENDER_NAME;}
-		if (defined('MAIL_DISABLE_AUTH')) {$this->disableAuth = MAIL_DISABLE_AUTH;}		
+		$this->mailservice->setFrom($this->from, $this->fromName);
 	}
 
-	public function send($bodyTemplate, array $templateData = []) {
-		$this->render($bodyTemplate, $templateData);
-	}
+	private function setup_recipients() {
 
-	public function render($bodyTemplate, array $templateData = []) {
+		if (!is_array($this->to)) {$this->to = [$this->to];}
 
-		$this->data = $templateData;
-
-		// converts Viewdata to useable $variables in the Template
-		if (is_array($this->data)) {
-			extract($this->data, EXTR_OVERWRITE);
+		foreach ($this->to as $recipient) {
+			$this->mailservice->addAddress($recipient);
 		}
 
-		ob_start();
-			include(tpl($bodyTemplate));
-			$this->mailbody = ob_get_contents();
-		ob_end_clean();
-
-		try {
-			$this->sendWithPHPMailer();
-
-		} catch (\Exception $e) {
-			Log::error('Mailer - ' . $e->getMessage());
-			if (!ENV_PRODUCTION) { dd('Mailer - ' . $e->getMessage()); }
-		}
-
-	}
-
-	private function sendWithPHPMailer() {
-
-		$this->mailer = new PHPMailer(true); // Passing `true` enables exceptions
-
-		$this->mailer->isSMTP();							// Set mailer to use SMTP
-		$this->mailer->Host = MAIL_SERVER;					// Specify main and backup SMTP servers
-		$this->mailer->SMTPAuth = true;						// Enable SMTP authentication
-		$this->mailer->Username = MAIL_USERNAME;			// SMTP username
-		$this->mailer->Password = MAIL_PW;					// SMTP password
-		$this->mailer->SMTPSecure = 'ssl';					// Enable TLS encryption, `ssl` also accepted
-		$this->mailer->Port = 465;							// TCP port to connect to
-		$this->mailer->isHTML(true);						// Set email format to HTML
-		$this->mailer->CharSet = 'UTF-8';
-
-		if ($this->disableAuth) {
-			$this->mailer->SMTPAuth = false;			
-			$this->mailer->SMTPSecure = false;
-			$this->mailer->SMTPAutoTLS = false;
-			$this->mailer->Port = 25;
-		}
-
-		$this->mailer->setFrom($this->from, $this->fromName);
-		$this->mailer->Subject = $this->subject;
-
-
-		if (is_array($this->to)) {
-			foreach ($this->to as $recipient) {
-				$this->mailer->addAddress($recipient);
-			}
-		}
-
-
-		if (is_array($this->cc)) {
+		if (!empty($this->cc)) {
+			if (!is_array($this->cc)) {$this->cc = [$this->cc];}
 			foreach ($this->cc as $recipient) {
-				$this->mailer->AddCC($recipient);
+				$this->mailservice->AddCC($recipient);
 			}
 		}
 
-		if (is_array($this->bcc)) {
+		if (!empty($this->bcc)) {
+			if (!is_array($this->bcc)) {$this->bcc = [$this->bcc];}
 			foreach ($this->bcc as $recipient) {
-				$this->mailer->AddBCC($recipient);
+				$this->mailservice->AddBCC($recipient);
 			}
 		}
-
-		$this->mailer->Body = $this->mailbody;
-
-
-		// FIIIIIREEEEEEEEE!!!!!
-		return $this->mailer->send();
 
 	}
 
+	private function setup_content() {
+
+		$templateEngine = new TemplateEngine($this->template, $this->templateData);
+		$this->mailservice->Body = $templateEngine->burn();
+		$this->mailservice->Subject = $this->subject;
+
+	}
+
+	private function setup_attachments() {
+
+		if (!$this->files) {return;}
+		if (!is_array($this->files)) {$this->files = [$this->files];}
+		foreach ($this->files as $file) {
+			$this->mailservice->addAttachment($file);
+		}
+
+	}
+
+	private function setup_service() {
+
+		// Passing `true` enables exceptions
+		if (!ENV_PRODUCTION) { $service = new PHPMailer(true); }
+		else { $service = new PHPMailer(); }
+
+		$service->isSMTP();
+		$service->isHTML(true); // Set email format to HTML
+		$service->CharSet = 'UTF-8';
+
+		//$service->setLanguage('de'); // Error Message Language
+		//$service->SMTPDebug = 4;
+
+		$service->Host = MAIL_SERVER;
+		$service->SMTPAuth = true;
+		$service->Username = MAIL_USERNAME;
+		$service->Password = MAIL_PW;
+		$service->SMTPSecure = 'ssl'; // Enable TLS encryption, `ssl` also accepted
+		$service->Port = 465;
+
+		if (defined('MAIL_DISABLE_AUTH') && MAIL_DISABLE_AUTH == true) {
+			$service->SMTPAuth = false;
+			$service->SMTPSecure = false;
+			$service->SMTPAutoTLS = false;
+			$service->Port = 25;
+		}
+
+		$this->mailservice = $service;
+
+	}
 
 }
