@@ -119,7 +119,7 @@ class SQLdb implements Database
 			$SQLstatement = $this->connection->prepare(
 				"SELECT ".$this->columns()."
 				 FROM `$this->table`
-				 WHERE CONCAT($columns) LIKE :term
+				 WHERE CONCAT_WS('', $columns) LIKE :term
 			 	 ORDER BY $this->orderby $this->order
 			 	 LIMIT $this->offset, $this->limit"
 			);
