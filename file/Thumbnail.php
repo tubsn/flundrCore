@@ -32,6 +32,7 @@ class Thumbnail {
 		try {
 
 			$img = $this->converter->make($pathToFile);
+			$img->orientate();
 			$img->fit($this->width, $this->height, function ($constraint) { $constraint->upsize(); });
 			$img->save($this->outputPath, $this->quality, $this->format);
 
