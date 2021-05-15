@@ -57,7 +57,13 @@ abstract class htmlView implements ViewInterface {
 	}
 
 	public function back() {
-		$this->redirect(Session::get('referer') ?? $_POST['referer'] ?? '/');
+		$url = Session::get('referer') ?? $_POST['referer'] ?? '/';
+
+		// Prevent non Relative URLs to deny open redirects
+		if (substr($url, 0, 2 ) === '//') {$url = '/';}
+		if (substr($url, 0, 1 ) !== '/') {$url = '/';}
+
+		$this->redirect($url);
 	}
 
 	public function referer($url = null) {
