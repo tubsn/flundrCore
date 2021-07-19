@@ -145,7 +145,9 @@ class SQLdb implements Database
 		$SQLstatement = $this->connection->prepare(
 			"SELECT ".$this->columns()."
 			 FROM `$this->table`
-			 WHERE `$column` = :term"
+			 WHERE `$column` = :term
+			 ORDER BY $this->orderby $this->order
+			 LIMIT $this->offset, $this->limit"
 		);
 
 		$SQLstatement->execute([':term' => $term]);
