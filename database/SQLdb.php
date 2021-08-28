@@ -119,7 +119,7 @@ class SQLdb implements Database
 			$SQLstatement = $this->connection->prepare(
 				"SELECT ".$this->columns()."
 				 FROM `$this->table`
-				 WHERE CONCAT_WS('', $columns) LIKE :term
+				 WHERE CONCAT($columns) LIKE :term
 			 	 ORDER BY $this->orderby $this->order
 			 	 LIMIT $this->offset, $this->limit"
 			);
@@ -145,9 +145,7 @@ class SQLdb implements Database
 		$SQLstatement = $this->connection->prepare(
 			"SELECT ".$this->columns()."
 			 FROM `$this->table`
-			 WHERE `$column` = :term
-			 ORDER BY $this->orderby $this->order
-			 LIMIT $this->offset, $this->limit"
+			 WHERE `$column` = :term"
 		);
 
 		$SQLstatement->execute([':term' => $term]);
@@ -290,5 +288,33 @@ class SQLdb implements Database
 
 		return null;
 	}
+
+
+	public function create_or_update($record) {
+
+		// Sanitize Data, Hash Passwords and Pre-Format for PDO->prepare
+		$record = $this->remove_fields($record, $this->protected);
+		$record = $this->prepare_for_mass_insertion($record, $keepPrimaryIndex = true);
+
+		if (empty($record)) {return null;}
+
+		try {
+			$stmt = $this->connection->prepare(
+				"INSERT INTO `$this->table` (".$record['fieldNames'].") VALUES (".$record['valueNames'].")
+				ON DUPLICATE KEY UPDATE " . $record['updateFields']
+			);
+			$stmt->execute($record['values']);
+
+			return $stmt->rowCount(); // Returns true if something got changed
+
+		}
+		catch(\PDOException $e) {
+			die ($e->getMessage()); // die on error
+		}
+
+		return null;
+	}
+
+
 
 }

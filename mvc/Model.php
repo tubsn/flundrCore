@@ -50,6 +50,10 @@ abstract class Model {
 		return $this->db->create($data);
 	}
 
+	public function create_or_update(array $data) {
+		return $this->db->create_or_update($data);
+	}
+
 	public function set(array $data, $id) {
 		return $this->db->update($data, $id);
 	}
