@@ -1,36 +1,20 @@
 <?php
 // Shorthand for Die and Dump with a styled CSS Layout
 function dd($var) {
-
-	echo '<!DOCTYPE html>
-	<html lang="de">
-	<head>
-		<title> Flundr Debug Info</title>
-		<meta charset="utf-8">
-	</head>
-	<body style="margin:5% auto; max-width:90%; font-family:Droid Sans, Consolas, sans-serif; font-size:1.4em; line-height:110%; background:#2b303e; color:#f6f6f6;">
-
-	<h1>Flundr Debug Info</h1>
-	<hr />
-	<pre>';
-
-	print_r($var);
-
-	echo '</pre>
-	<hr /><small>Processing Time: ';
-	echo (microtime(true)-APP_START)*1000;
-	echo' ms</small></body>
-	</html>';
-
-	die;
+	\flundr\rendering\QuickDump::dump_and_die($var);
 }
 
 // Shorthand for Echoing Arrays and stuff
 function dump($var) {
-	echo '<pre>';
-	print_r($var);
-	echo '</pre>';
+	\flundr\rendering\QuickDump::dump($var);
 }
+
+// Dumps an Array to HTML Table
+function dump_table(array $data) {
+	\flundr\rendering\QuickDump::dump_table($data);
+}
+function table_dump($data) {dump_table($data);}
+
 
 // Shorthand for Including Templates
 function tpl($templateName) {
