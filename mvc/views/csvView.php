@@ -28,6 +28,32 @@ class csvView implements ViewInterface {
 
 	}
 
+	public function export($array) {
+
+		header( 'Content-Type: text/csv;charset=UTF-8' );
+		header( 'Content-Disposition: attachment;filename=' . $this->title);
+
+		echo "\xEF\xBB\xBF"; // UTF-8 BOM (Forces Excel to read the File with UTF-8)
+		$output = fopen('php://output', 'w');
+
+		$headerColumns = array_keys($array[array_key_first($array)]);
+
+		// Excel can't have uppercase ID as the first Column
+		if ($headerColumns[0] == 'ID') {
+			unset($headerColumns[0]);
+			array_unshift($headerColumns, 'id');
+		}
+
+		// First Line is the header
+		fputcsv($output, $headerColumns, ';');
+
+		foreach ($array as $line) {
+			fputcsv($output, $line, ';');
+		}
+
+	}
+
+
 	// Helper Function for HTML Redirects
 	public function redirect($url, $code='301') {
 		header("Location:" . $url, true, $code); exit;

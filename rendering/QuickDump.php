@@ -38,10 +38,10 @@ class QuickDump {
 	}
 
 	public static function dump_table($data) {
-		echo self::table_template($data);
+		echo self::html_table_template($data);
 	}
 
-	private static function table_template($data) {
+	private static function html_table_template($data) {
 
 		$out = '<table class="fancy js-sortable">' . PHP_EOL;
 		$out .= '	<thead>' . PHP_EOL;
@@ -71,5 +71,32 @@ class QuickDump {
 		return $out;
 
 	}
+
+
+	public function export_to_csv(array $data, $fileName = 'export.csv') {
+
+		header( 'Content-Type: text/csv;charset=UTF-8' );
+		header( 'Content-Disposition: attachment;filename=' . $fileName);
+
+		echo "\xEF\xBB\xBF"; // UTF-8 BOM (Forces Excel to read the File with UTF-8)
+		$output = fopen('php://output', 'w');
+
+		$headerColumns = array_keys($data[array_key_first($data)]);
+
+		// Excel can't have uppercase ID as the first Column
+		if ($headerColumns[0] == 'ID') {
+			unset($headerColumns[0]);
+			array_unshift($headerColumns, 'id');
+		}
+
+		// First Line is the header
+		fputcsv($output, $headerColumns, ';');
+
+		foreach ($data as $line) {
+			fputcsv($output, $line, ';');
+		}
+
+	}
+
 
 }

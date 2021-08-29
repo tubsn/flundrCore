@@ -3,6 +3,7 @@
 namespace flundr\mvc\views;
 
 use \flundr\rendering\TemplateEngine;
+use \flundr\rendering\QuickDump;
 use \flundr\utility\Session;
 use \flundr\mvc\ViewInterface;
 
@@ -57,13 +58,7 @@ abstract class htmlView implements ViewInterface {
 	}
 
 	public function back() {
-		$url = Session::get('referer') ?? $_POST['referer'] ?? '/';
-
-		// Prevent non Relative URLs to deny open redirects
-		if (substr($url, 0, 2 ) === '//') {$url = '/';}
-		if (substr($url, 0, 1 ) !== '/') {$url = '/';}
-
-		$this->redirect($url);
+		$this->redirect(Session::get('referer') ?? $_POST['referer'] ?? '/');
 	}
 
 	public function referer($url = null) {
@@ -75,6 +70,11 @@ abstract class htmlView implements ViewInterface {
 	public function json($templateData) {
 		header("Content-type: application/json; charset=utf-8");
 		echo json_encode($templateData);
+	}
+
+	public function csv($array, $fileName = null) {
+		$qd = new QuickDump();
+		$qd->export_to_csv($array, $fileName ?? $this->title);
 	}
 
 	private function combine_data_sources($templateVars, $controllerData) {
