@@ -12,8 +12,8 @@ class Email {
 	private $mailservice;
 
 	public $subject = 'Infomail';
-	public $from = 'mail@flundr.com';
-	public $fromName = 'Flundr';
+	public $from;
+	public $fromName;
 	public $to;
 	public $cc;
 	public $bcc;
@@ -55,8 +55,17 @@ class Email {
 	}
 
 	private function setup_sender() {
-		if (defined('MAIL_SENDER_ADDRESS')) {$this->from = MAIL_SENDER_ADDRESS;}
-		if (defined('MAIL_SENDER_NAME')) {$this->fromName = MAIL_SENDER_NAME;}
+
+		if (empty($this->from)) {
+			if (defined('MAIL_SENDER_ADDRESS')) {$this->from = MAIL_SENDER_ADDRESS;}
+			else {$this->from = 'mail@flundr.com';}
+		}
+
+		if (empty($this->fromName)) {
+			if (defined('MAIL_SENDER_NAME')) {$this->fromName = MAIL_SENDER_NAME;}
+			else {$this->fromName = 'Flundr';}
+		}
+
 		$this->mailservice->setFrom($this->from, $this->fromName);
 	}
 
