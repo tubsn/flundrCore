@@ -7,12 +7,13 @@ use flundr\auth\Auth;
 
 class Storage {
 
-	public $folder = 'uploads';					// Subfolder in the PUBLIC Folder
+	public $folder = 'uploads';			// Subfolder in the PUBLIC Folder
 	public $uploadContainerName = 'uploads';	// HTML Form Input Container Name
 	public $formats = ['jpg','jpeg','gif','png','webp'];
 	public $maxSize = 25 * 1024 * 1024; // 25mb
 	public $maxFiles = 10;
 	public $seedFilenames = true;
+	public $forceFilename = false;	
 
 	public $thumbnails = false;
 	public $thumbWidth = 480;
@@ -111,9 +112,16 @@ class Storage {
 			$filename = $this->add_seed($file['filename']);
 			$file['seeded_filename'] = $filename;
 		}
-		$file['url'] = '/' . $this->folder . '/' . $filename . '.' . $file['extension'];
 
-		$storagePath = $this->storage_path() . $filename . '.' . $file['extension'];
+		$filename = $filename . '.' . $file['extension'];
+		if ($this->forceFilename) {
+			$filename = $this->forceFilename;
+			$file['filename'] = $this->forceFilename;
+		}
+
+		$file['url'] = '/' . $this->folder . '/' . $filename;
+
+		$storagePath = $this->storage_path() . $filename;
 		$writeOk = move_uploaded_file($file['tmp_name'], $storagePath);
 
 		if ($writeOk) {
