@@ -38,10 +38,46 @@ class QuickDump {
 	}
 
 	public static function dump_table($data) {
-		echo self::html_table_template($data);
+
+	    $keys = array_keys($data);
+	    $is_assoc = array_keys($keys) !== $keys;
+
+		if ($is_assoc) {
+			echo self::assoc_array_to_html_table_template($data);
+		}
+
+		else {
+			echo self::array_to_html_table_template($data);
+		}
+
 	}
 
-	private static function html_table_template($data) {
+	private static function assoc_array_to_html_table_template($data) {
+
+		$out = '<table class="fancy js-sortable">' . PHP_EOL;
+		$out .= '	<thead>' . PHP_EOL;
+		$out .= '		<tr>' . PHP_EOL;
+		$out .= '			<th>Index</th>' . PHP_EOL;
+		$out .= '			<th>Value</th>' . PHP_EOL;
+		$out .= '		</tr>' . PHP_EOL;
+		$out .= '	</thead>' . PHP_EOL;
+		$out .= '	<tbody>' . PHP_EOL;
+
+		foreach ($data as $key => $value) {
+			$out .= '		<tr>' . PHP_EOL;
+			$out .= '			<td class="narrow">' . $key . '</td>' . PHP_EOL;
+			$out .= '			<td class="narrow">' . $value . '</td>' . PHP_EOL;
+			$out .= '		</tr>' . PHP_EOL;
+		}
+
+		$out .= '	</tbody>' . PHP_EOL;
+		$out .= '</table>' . PHP_EOL;
+
+		return $out;
+
+	}
+
+	private static function array_to_html_table_template($data) {
 
 		$out = '<table class="fancy js-sortable">' . PHP_EOL;
 		$out .= '	<thead>' . PHP_EOL;
