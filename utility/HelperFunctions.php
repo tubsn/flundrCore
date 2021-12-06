@@ -38,6 +38,18 @@ function slugify($urlString) {
 
 }
 
+function percentage($a, $b) {
+	return \flundr\utility\PercentCalculator::percentage($a, $b);
+}
+
+function percentage_of($a, $b) {
+	return \flundr\utility\PercentCalculator::of($a, $b);
+}
+
+function percentage_difference($a, $b) {
+	return \flundr\utility\PercentCalculator::difference($a, $b);
+}
+
 // Shorthand for Date Transformations
 function formatDate($date, $format='Y-m-d') {
 	if (is_null($date)) {
