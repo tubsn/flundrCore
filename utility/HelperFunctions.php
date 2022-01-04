@@ -50,6 +50,14 @@ function percentage_difference($a, $b, $decimals = 2) {
 	return \flundr\utility\PercentCalculator::difference($a, $b, $decimals);
 }
 
+function array_group_by($key, $array) {
+	return \flundr\utility\ArrayTools::group_by($key, $array);
+}
+
+function array_sum_grouped_by($value, $key, $array) {
+	return \flundr\utility\ArrayTools::sum_grouped_by($value, $key, $array);
+}
+
 // Shorthand for Date Transformations
 function formatDate($date, $format='Y-m-d') {
 	if (is_null($date)) {
