@@ -50,6 +50,10 @@ function percentage_difference($a, $b, $decimals = 2) {
 	return \flundr\utility\PercentCalculator::difference($a, $b, $decimals);
 }
 
+function gnum($number, $decimals = 0) {
+	return number_format($number,$decimals,',','.');
+}
+
 function array_group_by($key, $array) {
 	return \flundr\utility\ArrayTools::group_by($key, $array);
 }
