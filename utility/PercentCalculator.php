@@ -22,7 +22,7 @@ class PercentCalculator
 	}
 
 	public static function of(float $percent, float $value, int $decimals = 2) {
-		$result = $value * ($percentage / 100);
+		$result = $value * ($percent / 100);
 		return round($result, $decimals);
 	}
 
