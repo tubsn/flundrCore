@@ -10,12 +10,18 @@ class ArrayTools
 		$result = [];
 
 		foreach($data as $value) {
+
+			$entry = $value;
+			unset($entry[$key]);
+
 			if (array_key_exists($key, $value)) {
-			    $result[$value[$key]][] = $value;
+			    $result[$value[$key]][] = $entry;
 			}
 			else {
-			    $result[""][] = $value;
+			    $result[""][] = $entry;
 			}
+
+
 		}
 
 		return $result;
