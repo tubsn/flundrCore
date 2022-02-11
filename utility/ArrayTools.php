@@ -32,17 +32,24 @@ class ArrayTools
 		$result = [];
 
 		foreach($data as $value) {
+
 			if (array_key_exists($keyToGroup, $value)) {
+
 				if (!isset($result[$value[$keyToGroup]])) {
 					$result[$value[$keyToGroup]] = $value[$keyToSum];
 				}
-			    $result[$value[$keyToGroup]] = $result[$value[$keyToGroup]] + $value[$keyToSum];
+				else {
+			    		$result[$value[$keyToGroup]] = $result[$value[$keyToGroup]] + $value[$keyToSum];
+				}
+
 			}
 			else {
+
 				if (!isset($result[''])) {
 					$result[''] = $value[$keyToSum];
 				}
 			    $result[''] = $result[$value[$keyToGroup]] + $value[$keyToSum];
+
 			}
 		}
 
