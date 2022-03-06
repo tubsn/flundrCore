@@ -37,8 +37,11 @@ class AuthInstall
 	public function create_user() {
 
 		$email = readline('Enter Admin-User E-Mail: ');
-		$password = readline('Choose a Password: ');
-
+		
+		echo 'Choose a Password: ';
+		echo "\033[30;40m";
+		$password = readline('');
+		echo "\033[0m";
 		$this->db->table = $this->userTable;
 
 		$user = [
