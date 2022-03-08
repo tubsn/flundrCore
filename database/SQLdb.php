@@ -233,17 +233,12 @@ class SQLdb implements Database
 
 		$data = $this->prepare_for_mass_insertion($newRecord, true); // true = keep the PrimaryIndex
 
-		try {
-			$stmt = $this->connection->prepare(
-				"INSERT INTO `$this->table` (".$data['fieldNames'].") VALUES (".$data['valueNames'].")"
-			);
+		$stmt = $this->connection->prepare(
+			"INSERT INTO `$this->table` (".$data['fieldNames'].") VALUES (".$data['valueNames'].")"
+		);
 
-			$stmt->execute($data['values']);
-			return ($this->connection->lastInsertId());
-
-		} catch(\PDOException $e) {
-			die ($e->getMessage()); // die on error
-		}
+		$stmt->execute($data['values']);
+		return ($this->connection->lastInsertId());
 
 		return false;
 	}
@@ -271,22 +266,15 @@ class SQLdb implements Database
 		// Add the Target RowID to the PDO Query
 		$record['values'][':RowID'] = $id;
 
-		try {
-			$stmt = $this->connection->prepare(
-				"UPDATE `$this->table`
-				SET ".$record['updateFields']."
-				WHERE `$this->primaryIndex` = :RowID LIMIT 1"
-			);
-			$stmt->execute($record['values']);
+		$stmt = $this->connection->prepare(
+			"UPDATE `$this->table`
+			SET ".$record['updateFields']."
+			WHERE `$this->primaryIndex` = :RowID LIMIT 1"
+		);
+		$stmt->execute($record['values']);
 
-			return $stmt->rowCount(); // Returns true if something got changed
+		return $stmt->rowCount(); // Returns true if something got changed
 
-		}
-		catch(\PDOException $e) {
-			die ($e->getMessage()); // die on error
-		}
-
-		return null;
 	}
 
 
@@ -298,21 +286,14 @@ class SQLdb implements Database
 
 		if (empty($record)) {return null;}
 
-		try {
-			$stmt = $this->connection->prepare(
-				"INSERT INTO `$this->table` (".$record['fieldNames'].") VALUES (".$record['valueNames'].")
-				ON DUPLICATE KEY UPDATE " . $record['updateFields']
-			);
-			$stmt->execute($record['values']);
+		$stmt = $this->connection->prepare(
+			"INSERT INTO `$this->table` (".$record['fieldNames'].") VALUES (".$record['valueNames'].")
+			ON DUPLICATE KEY UPDATE " . $record['updateFields']
+		);
+		$stmt->execute($record['values']);
 
-			return $stmt->rowCount(); // Returns true if something got changed
+		return $stmt->rowCount(); // Returns true if something got changed
 
-		}
-		catch(\PDOException $e) {
-			die ($e->getMessage()); // die on error
-		}
-
-		return null;
 	}
 
 
