@@ -73,7 +73,8 @@ class Auth
 	private static function has_feature($features, $fieldname) {
 
 		if (empty(self::$authUser) || self::$authUser == false) {return false;}
-
+		if (empty(self::$authUser[$fieldname])) {return false;}
+		
 		$userFeatures = array_map('trim', explode(',', self::$authUser[$fieldname]));
 		$features = array_map('trim', explode(',', $features));
 
