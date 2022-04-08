@@ -50,7 +50,8 @@ function percentage_difference($a, $b, $decimals = 2) {
 	return \flundr\utility\PercentCalculator::difference($a, $b, $decimals);
 }
 
-function gnum($number, $decimals = 0) {
+function gnum($number, $decimals = 0, $defaultIfEmpty = '-') {
+	if (empty($number)) {return $defaultIfEmpty;}
 	return number_format($number,$decimals,',','.');
 }
 
