@@ -57,8 +57,8 @@ abstract class htmlView implements ViewInterface {
 		header("Location:" . $url, true, $code); exit;
 	}
 
-	public function back() {
-		$this->redirect(Session::get('referer') ?? $_POST['referer'] ?? '/');
+	public function back($fallbackURL = '/') {
+		$this->redirect(Session::get('referer') ?? $_POST['referer'] ?? $fallbackURL);
 	}
 
 	public function referer($url = null) {
