@@ -8,6 +8,7 @@ class Datepicker
 	public $pickerFormat = 'M Y';
 	public $intervalFormat = 'P1M';
 	public $includeCurrentDate = true;
+	public $decending = true;
 
 	public function months($startDate = null, $endDate = null) {
 		if ($this->includeCurrentDate) {$this->intervalFormat = 'P1D';}
@@ -31,6 +32,7 @@ class Datepicker
 			$monthList[$index]['end'] = $date->format('Y-m-t');
 		}
 
+		if ($this->decending) {return array_reverse($monthList);}
 		return $monthList;
 
 	}
