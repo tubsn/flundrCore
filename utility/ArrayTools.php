@@ -56,4 +56,11 @@ class ArrayTools
 		return $result;
 	}
 
+	// Counts occurances of specific values in an Array
+	public static function count_by_value($value, $column, array $array) {
+		return count(array_filter($array, function($entry) use ($column, $value) {
+			if ($entry[$column] == $value) {return $entry;}
+		}));
+	}
+
 }

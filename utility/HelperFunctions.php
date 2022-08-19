@@ -63,6 +63,10 @@ function array_sum_grouped_by($value, $key, $array) {
 	return \flundr\utility\ArrayTools::sum_grouped_by($value, $key, $array);
 }
 
+function array_count_by_value($value, $key, $array) {
+	return \flundr\utility\ArrayTools::count_by_value($value, $key, $array);
+}
+
 // Shorthand for Date Transformations
 function formatDate($date, $format='Y-m-d') {
 	if (is_null($date)) {
