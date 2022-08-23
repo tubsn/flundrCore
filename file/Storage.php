@@ -222,6 +222,7 @@ class Storage {
 
 			foreach ($container as $value) {
 
+				if ($fieldName == 'full_path') {continue;} // Ignores the PHP8.1 Feature for directories
 				if ($fieldName == 'name') {
 					$value = $this->sanitize($value);
 				}
