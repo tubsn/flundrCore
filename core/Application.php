@@ -31,7 +31,7 @@ class Application {
 	}
 
 	private function handle_URL_routing() {
-		$router = new Router($_SERVER['REQUEST_METHOD'], $_SERVER["REQUEST_URI"]);
+		$router = new Router($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
 		$this->controller = CONTROLLER_NAMESPACE . $router->controller;
 		$this->action = $router->action;
 		$this->parameters = $router->parameters;
