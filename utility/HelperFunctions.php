@@ -51,7 +51,7 @@ function percentage_difference($a, $b, $decimals = 2) {
 }
 
 function gnum($number, $decimals = 0, $defaultIfEmpty = '-') {
-	if (empty($number) && $number != 0) {return $defaultIfEmpty;}
+	if (empty($number) && $number != 0 || $number === null) {return $defaultIfEmpty;}
 	return number_format($number,$decimals,',','.');
 }
 
