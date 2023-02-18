@@ -68,10 +68,8 @@ function array_count_by_value($value, $key, $array) {
 }
 
 // Shorthand for Date Transformations
-function formatDate($date, $format='Y-m-d') {
-	if (is_null($date)) {
-		return null;
-	}
+function formatDate($date, $format='Y-m-d', $default=null) {
+	if (is_null($date)) {return $default;}
 	$date = new \DateTime($date);
 	return $date->format($format);
 }
