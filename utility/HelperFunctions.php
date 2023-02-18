@@ -79,9 +79,10 @@ function explode_and_trim($delimiter, $string) {
 }
 
 function remove_from_list($id, $list) {
+	if ($id == $list) {return null;}
 	$elements = explode_and_trim(',' , $list);
 	$key = array_search($id, $elements);
-	if (!$key) {return $list;}
+	if ($key === false) {return $list;}
 	unset($elements[$key]);
 	return implode(',', $elements);
 }
