@@ -202,6 +202,7 @@ class Storage {
 	private function push_to_failed($file, $reason = 'unspecified Error') {
 		$file['error'] = $reason;
 		unset($file['tmp_name']);
+		unset($file['full_path']);
 		unset($file['created_by']);
 		array_push ($this->failedFiles, $file);
 	}
@@ -209,6 +210,7 @@ class Storage {
 	private function push_to_stored($file) {
 		unset($file['error']);
 		unset($file['tmp_name']);
+		unset($file['full_path']);
 		array_push ($this->storedFiles, $file);
 	}
 
