@@ -23,6 +23,11 @@ class Sanitize
 				continue; // NULL Values should stay NULL
 			}
 
+			if (is_array($value)) {
+				$sanitizedOutput[$key] = json_encode($value);
+				continue; // Allows arrays to ba saved as json
+			}			
+			
 			$key = str_replace('--', '',$key); // Remove doubledashes --
 			$key = preg_replace("/[^a-zA-Z0-9-_äöüÄÖÜ]+/", "", $key); // remove all but Chars, Letters and -_
 
