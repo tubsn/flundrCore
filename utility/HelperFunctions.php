@@ -113,6 +113,13 @@ function consume_flash() {
 
 function empty_to_null($array) {
 	$array = array_map(function($value){
+		if (is_array($value)) {
+			$value = empty_to_null($value); 
+			$value = array_filter($value, function($data) {
+				return ($data !== null && $data !== false && $data !== ''); // Removes empty Array values excluding '0'
+			});
+		}
+		if ($value == '0') {return 0;}
 		return (empty($value)) ? null : $value;
 	},$array);
 	return $array;
