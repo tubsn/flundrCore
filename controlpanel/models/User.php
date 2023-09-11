@@ -14,7 +14,7 @@ class User extends Model
 		if (defined('TABLE_USERS')) {$this->db->table = TABLE_USERS;}
 		else {$this->db->table = 'users';}
 
-		$this->db->columns = ['id','edited','created','email','firstname','lastname',"'groups'",'rights'];
+		$this->db->columns = ['id','edited','created','email','firstname','lastname','`groups`','rights'];
 		$this->db->protected = ['level',"'groups'",'rights']; // By Default these can't be changed
 
 	}
