@@ -7,6 +7,7 @@ use \flundr\database\SQLdb;
 class AuthInstall
 {
 
+	private $db;
 	private $authLogsTable = 'authlogs';
 	private $authTokenTable = 'authtokens';
 	private $userTable = 'users';
