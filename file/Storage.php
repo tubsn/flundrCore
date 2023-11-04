@@ -140,6 +140,14 @@ class Storage {
 			throw new \Exception('No Files Array submitted', 400);
 		}
 
+		// If the data is not splitt into strange arrays this should be a Javascript Upload
+		$first = array_values($fileContainer)[0];
+		$firstField = array_values($first)[0];
+		if (!is_array($firstField)) {
+			$files = $this->check_number_of_files($fileContainer);
+			return $files;
+		}
+		
 		if (!isset($fileContainer[$this->uploadContainerName])) {
 			throw new \Exception('HTML-Input-Element Field "name" is expected to be "' . $this->uploadContainerName . '[]"', 400);
 		}
