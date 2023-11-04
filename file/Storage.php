@@ -136,7 +136,7 @@ class Storage {
 
 	private function validate_upload($fileContainer) {
 
-		if (!is_array($fileContainer)) {
+		if (!is_array($fileContainer) || empty($fileContainer)) {
 			throw new \Exception('No Files Array submitted', 400);
 		}
 
