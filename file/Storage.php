@@ -105,7 +105,7 @@ class Storage {
 
 	private function move_to_disk($file) {
 
-		if (!is_dir($this->storage_path())) {mkdir($this->storage_path());}
+		if (!is_dir($this->storage_path())) {mkdir($this->storage_path(), 0777, true);}
 
 		$filename = $file['filename'];
 		if ($this->seedFilenames) {
