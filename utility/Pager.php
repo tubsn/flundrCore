@@ -11,66 +11,86 @@ class Pager
 	function __construct($numberOfItems, $itemsPerPage = 20){
 
 		// If there is more Items per Page than Items overall
-		if ($itemsPerPage >= $numberOfItems) {
-			return false;
-		}
+		if ($itemsPerPage >= $numberOfItems) {return false;}
 
 		// Number of Pages
-		$pages = ceil($numberOfItems / $itemsPerPage);
+		$numberOfPages = ceil($numberOfItems / $itemsPerPage);
 
 		// Aktuelle Seite per Get "p=x" ziehen max Wert = Anzahl pages
-		$currentPage = min($pages, filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT, array(
-			'options' => array(
+		$currentPage = min($numberOfPages, filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT, [
+			'options' => [
 				'default'   => 1,
 				'min_range' => 1,
-			),
-		)));
+			],
+		]));
 
 		// Get Parameter rückwärts einlesen so das p hinten hängt
 		$getParams = $_GET;
 
-		// Seite Zurück Link generieren
-		if ($currentPage > 1) {
-				// p neusetzen mit Aktueller Page -1
-			$getParams['p'] = $currentPage - 1;
-			$prevlink = '<li><a href="?'.http_build_query($getParams).'">&laquo; vorherige Seite</a></li>';
-		} else {
-			// Kein Link da erste Seite
-			$prevlink = '<li><a class="disabled">&laquo; vorherige Seite</a></li>';
-		} // End Currentpage > 1
+		if ($currentPage == 0) {
+			$currentPage =1;
+		}
 
-		// Nächste Seite Link generieren
-		if ($currentPage < $pages) {
-			// p neusetzen mit Aktueller Page -1
-			$getParams['p'] = $currentPage + 1;
-			$nextlink = '<li><a href="?'.http_build_query($getParams).'">nächste Seite &raquo;</a></li>';
-		} else {
-			// Kein Link da erste Seite
-			$nextlink = '<li><a class="disabled">nächste Seite &raquo;</a></li>';
-		} // End $currentPage < $pages
+		$pages = range(1, $numberOfPages);
 
-		// 1,2,3,4,...
-		$centerLinks ='';
-		for ($i = 1; $i <= $pages; $i++) {
-			$getParams['p'] = $i;
-			if ($i != $currentPage) {
-				$centerLinks .= '<li><a href="?'.http_build_query($getParams).'">'.$i.'</a></li>'; // Normale Seitenlinks
-			} else {
-				$centerLinks .= '<li><a class="active" href="?'.http_build_query($getParams).'">'.$i.'</a></li>'; // die aktuell gwählte Seite
+		if ($numberOfPages > 8) {
+			$start = array_slice($pages, 0,6);
+			$end = array_slice($pages, -2);
+			$pages = array_merge($start,['...'],$end);
+
+			if (($currentPage > 5) && $currentPage) {
+				$pre = range($currentPage-2, $currentPage+2);			
+				$end = array_slice($pages, -1);
+				$pages = array_merge([1],['...'],$pre, ['...'], $end);
 			}
+
+			if ($currentPage > $numberOfPages-5) {
+				$dif = $numberOfPages - $currentPage;
+				$pre = range($currentPage-5+$dif, $numberOfPages);			
+				$end = array_slice($pages, -2);
+				$pages = array_merge([1,2],['...'],$pre);
+			}
+
+		}
+
+		$centerLinks ='';
+		foreach ($pages as $page) {
+			$getParams['p'] = $page;
+
+			if ($page == '...') {$centerLinks .= '<li>&hellip;</li>'; continue;}
+
+			if ($page == $currentPage) {
+			$centerLinks .= '<li><a class="active" href="?'.http_build_query($getParams).'">'.$page.'</a></li>';		
+			continue;
+			}
+
+			$centerLinks .= '<li><a href="?'.http_build_query($getParams).'">'.$page.'</a></li>';
+		}
+
+		$prevlink = '';
+		if ($currentPage>1) {
+			$getParams['p'] = $currentPage-1;
+			$prevlink = '<li><a href="?'.http_build_query($getParams).'">«</a></li>';
+		}
+
+		$nextlink = '';
+		if ($currentPage<$numberOfPages) {
+			$getParams['p'] = $currentPage+1;
+			$nextlink = '<li><a href="?'.http_build_query($getParams).'">»</a></li>';
 		}
 
 		// Pager Zusammensetzen
-		$this->htmldata = '<ul class="pager">'.$centerLinks.'</ul>';
+		//$this->htmldata = '<ul class="pager">'.$centerLinks.'</ul>';
+		
 		// Pager mit nächste und vorherige Seite
-		// $this->htmldata = '<ul class="pager">'.$prevlink.$centerLinks.$nextlink.'</ul>';
+		$this->htmldata = '<ul class="pager">'.$prevlink.$centerLinks.$nextlink.'</ul>';
 
 		// Startitem Offset für das Query als Return-Wert
-		$this->offset = ($currentPage - 1) * $itemsPerPage;
+		$this->offset = 0;
+		if ($currentPage>1) {$this->offset = ($currentPage-1) * $itemsPerPage;}
 
-		return $this->htmldata; // Alle Pager Daten zurückgeben
+		return $this->htmldata;
 
 	} // End createPager()
-
 
 }
