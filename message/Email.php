@@ -133,7 +133,7 @@ class Email {
 		if (defined('MAIL_ENCRYPTION')) {$service->SMTPSecure = MAIL_ENCRYPTION;}
 
 		$service->Port = 465;
-		if (defined('MAIL_PORT')) {$service->SMTPSecure = MAIL_PORT;}
+		if (defined('MAIL_PORT')) {$service->Port = MAIL_PORT;}
 
 		if (defined('MAIL_DISABLE_AUTH') && MAIL_DISABLE_AUTH == true) {
 			$service->SMTPAuth = false;
