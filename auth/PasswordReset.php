@@ -13,7 +13,7 @@ class PasswordReset
 
 	private $authDB;
 	private $userDB;
-	private $resetExpire = '+1 Minutes';
+	private $resetExpire = '+30 Minutes';
 	public $mailTemplate = 'auth/reset-pw-email';
 	public $mailSubject = 'Password reset requested';
 	public $mailFrom = 'no-reply@flundr.de';
