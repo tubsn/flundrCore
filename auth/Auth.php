@@ -99,7 +99,7 @@ class Auth
 
 	private static function check_for_allowed_ip() {
 		$ipFieldName = 'REMOTE_ADDR';
-		if (defined(SERVER_IP_FIELDNAME)) {$ipFieldName = SERVER_IP_FIELDNAME;}
+		if (defined('SERVER_IP_FIELDNAME')) {$ipFieldName = SERVER_IP_FIELDNAME;}
 
 		if (in_array($_SERVER[$ipFieldName], self::allowed_ips())) {
 			self::$validIP = true;
