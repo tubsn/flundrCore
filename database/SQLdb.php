@@ -28,29 +28,48 @@ class SQLdb implements Database
 
 	function __construct($config) {
 		$this->load_db_settings($config);
-		$this->register_db_connection($config['user'], $config['password']);
+		$this->register_db_connection(
+			$config['user'], 
+			$config['password'], 
+			$config['ssl']['ca'] ?? null,
+			$config['ssl']['cert'] ?? null,
+			$config['ssl']['key']?? null,
+		);
 	}
 
-	private function register_db_connection($username, $password) {
-
+	private function register_db_connection($username, $password, $sslCa = null, $sslCert = null, $sslKey = null) {
+		
 		$PDOSetupString = 'mysql:host='.$this->host.';dbname='.$this->dbname.';charset='.$this->charset.';port='.$this->port;
-
+	
 		try {
-			$connection = new PDO($PDOSetupString, $username, $password);
-			$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Errormode Exceptions
-			$connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC); // Fetch as Associative Array
-		}
+			$options = [
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // Error mode
+				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // Fetch as associative array
+			];
+	
+			// Enable SSL if Certificate is available
+			if ($sslCa) {
+				$options[PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
+			}
+			if ($sslCert) {
+				$options[PDO::MYSQL_ATTR_SSL_CERT] = $sslCert;
+			}
+			if ($sslKey) {
+				$options[PDO::MYSQL_ATTR_SSL_KEY] = $sslKey;
+			}
+	
+			// Create PDO connection
+			$connection = new PDO($PDOSetupString, $username, $password, $options);
 
-		catch(PDOException $errorData) {
+		} catch (PDOException $errorData) {
 			http_response_code(500);
 			echo '<h1>Database Connection Error:</h1>';
 			echo '<p>' . $errorData->getFile() . '<br/>Error in Line: ' . $errorData->getLine() . '</p>';
 			echo '<mark>'. $errorData->getMessage().'</mark>';
 			die;
 		}
-
+	
 		$this->connection = $connection;
-
 	}
 
 	private function load_db_settings(array $config) {
