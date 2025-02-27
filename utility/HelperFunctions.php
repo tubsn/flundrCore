@@ -75,6 +75,7 @@ function formatDate($date, $format='Y-m-d', $default=null) {
 }
 
 function explode_and_trim($delimiter, $string) {
+	if (empty($string)) {return null;}
 	return array_map('trim', explode($delimiter, $string));
 }
 
