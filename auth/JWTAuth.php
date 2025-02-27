@@ -8,11 +8,21 @@ use Firebase\JWT\Key;
 class JWTAuth
 {
 
+	private $encryptionKey = null;
+
+	function __construct($encryptionKey = null) {
+
+		if (defined('ENCRYPTION_KEY')) { $configEncryptionKey = ENCRYPTION_KEY; }
+		else {$configEncryptionKey = null;}
+		$this->encryptionKey = $encryptionKey ?? $configEncryptionKey;
+		if (is_null($this->encryptionKey)) {throw new Exception("No encryption Key Provided", 500);}
+	}
+
 	public function create_token($userID = null, $domain = null, $expireTime = '+5 minutes') {
 
 		if (is_null($domain)) {$domain = $_SERVER['HTTP_HOST'];}
 
-		$secret_Key = ENCRYPTION_KEY;
+		$secret_Key = $this->encryptionKey;
 		$date = new \DateTimeImmutable();
 		$expire_at = $date->modify($expireTime)->getTimestamp();
 
@@ -29,7 +39,7 @@ class JWTAuth
 	}
 
 	public function authenticate($token, $domain = null) {
-		$token = JWT::decode($token, new Key(ENCRYPTION_KEY, 'HS512'));
+		$token = JWT::decode($token, new Key($this->encryptionKey, 'HS512'));
 		$now = new \DateTimeImmutable();
 
 		if (!$domain) {$domain = $_SERVER['HTTP_HOST'];}
@@ -48,6 +58,10 @@ class JWTAuth
 	public function authenticate_via_header($domain = null) {
 
 		$header = $this->authorization_header();
+
+		if (empty($header)) {
+			throw new \Exception("Bad Request - Header not Supplied", 400);
+		}
 
 		if (! preg_match('/Bearer\s(\S+)/', $header, $matches)) {
 			throw new \Exception("Bad Request - Token not Supplied", 400);
