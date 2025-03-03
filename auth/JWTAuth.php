@@ -24,6 +24,7 @@ class JWTAuth
 
 		$secret_Key = $this->encryptionKey;
 		$date = new \DateTimeImmutable();
+		$date = $date->modify('-5 seconds');		
 		$expire_at = $date->modify($expireTime)->getTimestamp();
 
 		$request_data = [
