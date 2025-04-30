@@ -9,7 +9,7 @@ class TemplateEngine {
 	private $templateDirectory = TEMPLATES;
 	private $templateExtension = TEMPLATE_EXTENSION;
 
-	public function __construct($templateBlocks, array $templateData = null) {
+	public function __construct($templateBlocks, ?array $templateData) {
 
 		// Force Templateblocks into Array if it's only one Template
 		if (!is_array($templateBlocks)) {
