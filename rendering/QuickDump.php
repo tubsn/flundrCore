@@ -52,6 +52,12 @@ class QuickDump {
 
 	}
 
+	public static function dump_json($var) {
+		header('Content-Type: application/json');
+		echo json_encode($var);
+		die;
+	}	
+	
 	private static function assoc_array_to_html_table_template($data) {
 
 		$out = '<table class="fancy js-sortable">' . PHP_EOL;
