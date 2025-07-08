@@ -15,6 +15,10 @@ function dump_table(array $data) {
 }
 function table_dump($data) {dump_table($data);}
 
+// Shorthand for Echoing Arrays and stuff
+function dump_json($var) {
+	\flundr\rendering\QuickDump::dump_json($var);
+}
 
 // Shorthand for Including Templates
 function tpl($templateName) {
