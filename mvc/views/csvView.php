@@ -45,10 +45,10 @@ class csvView implements ViewInterface {
 		}
 
 		// First Line is the header
-		fputcsv($output, $headerColumns, ';');
+		fputcsv($output, $headerColumns, ';', '"', '\\');
 
 		foreach ($array as $line) {
-			fputcsv($output, $line, ';');
+			fputcsv($output, $line, ';', '"', '\\');
 		}
 
 	}
