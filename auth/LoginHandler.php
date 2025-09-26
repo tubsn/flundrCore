@@ -39,7 +39,6 @@ class LoginHandler
 		if (!password_verify($userPW, $user['password'])) {
 			$recorder->prevent_brute_force();
 			throw new \Exception("Login Failed: wrong Password");
-			return false;
 		}
 
 		$recorder->login_successful();
@@ -77,7 +76,7 @@ class LoginHandler
 
 		$this->persistentCookie->invalidate_cookie();
 		Auth::checkout();
-		Session::delete('authUser');
+		Session::delete();
 
 		return true;
 	}
