@@ -76,7 +76,7 @@ class LoginHandler
 
 		$this->persistentCookie->invalidate_cookie();
 		Auth::checkout();
-		Session::delete();
+		Session::unset('authUser');
 
 		return true;
 	}
