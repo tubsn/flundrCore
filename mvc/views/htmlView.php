@@ -16,6 +16,7 @@ abstract class htmlView implements ViewInterface {
 	public $meta = null;
 	public $js = null;
 	public $framework = null;
+	public $modules = null;	
 	public $templates = [];
 	public $templateVars = [];
 
@@ -90,6 +91,7 @@ abstract class htmlView implements ViewInterface {
 		$page['meta'] = $this->meta;
 		$page['js'] = $this->to_array($this->js);
 		$page['framework'] = $this->to_array($this->framework);
+		$page['modules'] = $this->to_array($this->modules);		
 
 		$dataPackage['page'] = $page;
 
