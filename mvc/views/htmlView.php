@@ -104,6 +104,7 @@ abstract class htmlView implements ViewInterface {
 	}
 
 	private function to_array($data) {
+		if (empty($data)) {return [];}
 		if (is_array($data)) {return $data;}
 		return [$data];
 	}
