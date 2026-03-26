@@ -15,7 +15,7 @@ class JWTAuth
 		if (defined('ENCRYPTION_KEY')) { $configEncryptionKey = ENCRYPTION_KEY; }
 		else {$configEncryptionKey = null;}
 		$this->encryptionKey = $encryptionKey ?? $configEncryptionKey;
-		if (is_null($this->encryptionKey)) {throw new Exception("No encryption Key Provided", 500);}
+		if (is_null($this->encryptionKey)) {throw new Exception('No encryption Key Provided', 500);}
 	}
 
 	public function create_token($userID = null, $domain = null, $expireTime = '+5 minutes') {
@@ -40,17 +40,23 @@ class JWTAuth
 	}
 
 	public function authenticate($token, $domain = null) {
-		$token = JWT::decode($token, new Key($this->encryptionKey, 'HS512'));
+		
+		try {
+			$token = JWT::decode($token, new Key($this->encryptionKey, 'HS512'));	
+		} catch (\Exception $e) {
+			throw new \Exception('Unauthorized: ' . $e->getMessage(), 401);
+		}
+		
 		$now = new \DateTimeImmutable();
 
 		if (!$domain) {$domain = $_SERVER['HTTP_HOST'];}
 
 		if ($token->iss !== $domain) {
-			throw new \Exception("Request from Invalid Source", 401);
+			throw new \Exception('Unauthorized: Request from Invalid Source', 401);
 		}
 
 		if ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) {
-			throw new \Exception("Unauthorized", 401);
+			throw new \Exception('Unauthorized', 401);
 		}
 
 		return $token->sub;
@@ -61,17 +67,17 @@ class JWTAuth
 		$header = $this->authorization_header();
 
 		if (empty($header)) {
-			throw new \Exception("Bad Request - Header not Supplied", 400);
+			throw new \Exception('Bad Request - Header not Supplied', 400);
 		}
 
 		if (! preg_match('/Bearer\s(\S+)/', $header, $matches)) {
-			throw new \Exception("Bad Request - Token not Supplied", 400);
+			throw new \Exception('Bad Request - Token not Supplied', 400);
 		}
 
 		$token = $matches[1];
 		
 		if (!$token) {
-			throw new \Exception("Bad Request", 400);
+			throw new \Exception('Bad Request', 400);
 		}
 
 		return $this->authenticate($token, $domain);
@@ -82,10 +88,10 @@ class JWTAuth
 	public function authorization_header(){
 		$headers = null;
 		if (isset($_SERVER['Authorization'])) {
-			$headers = trim($_SERVER["Authorization"]);
+			$headers = trim($_SERVER['Authorization']);
 		}
 		else if (isset($_SERVER['HTTP_AUTHORIZATION'])) { 
-			$headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
+			$headers = trim($_SERVER['HTTP_AUTHORIZATION']);
 		} 
 
 		elseif (function_exists('apache_request_headers')) {
