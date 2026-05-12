@@ -156,3 +156,6 @@ function auth_rights($rights) {
 function auth_groups($groups) {
 	return \flundr\auth\Auth::has_group($groups);
 }
+
+// Facades
+class_alias(\flundr\cache\CacheFacade::class, 'Cache');

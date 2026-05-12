@@ -2,56 +2,132 @@
 
 namespace flundr\cache;
 
-class RequestCache
-{
+class RequestCache {
 
 	public $cacheIdentifier;
 	public $cacheExpire;
-	public $cacheDirectory = ROOT . 'cache';
+	private $cacheDirectory = ROOT . 'cache';
+	private $baseCacheDirectory = ROOT . 'cache';
 
-	public function __construct($identifier, $expire = 60) {
-		$this->cacheIdentifier = hash('crc32', $identifier);
+	public function __construct($identifier, int $expire = 60) {
+		$this->cacheIdentifier = hash('crc32', $this->build_identifier($identifier));
 		$this->cacheExpire = $expire;
 	}
 
+	public function cachedir(string $directory): void {
+		$normalizedDirectory = rtrim($directory, DIRECTORY_SEPARATOR);
+
+		if (!is_dir($normalizedDirectory)) {
+			mkdir($normalizedDirectory, 0777, true);
+		}
+
+		$baseCachePath = realpath($this->baseCacheDirectory);
+		$targetCachePath = realpath($normalizedDirectory);
+
+		if ($baseCachePath === false || $targetCachePath === false) {
+			throw new \RuntimeException('Cache directory could not be resolved');
+		}
+
+		if (strpos($targetCachePath, $baseCachePath) !== 0) {
+			throw new \RuntimeException('Cache directory must be inside ROOT . cache');
+		}
+
+		$this->cacheDirectory = $targetCachePath;
+	}
+
 	public function get() {
+		$cacheFile = $this->get_cache_file_path();
 
-		if ($this->cacheExpire == 0) {return null;}
-
-		$cacheFile = $this->cacheDirectory . DIRECTORY_SEPARATOR . $this->cacheIdentifier;
-
-		if($this->cache_is_valid($cacheFile, $this->cacheExpire)) {
-			$serializedData = file_get_contents($cacheFile);
-			return unserialize($serializedData);
+		if (!is_file($cacheFile)) {
+			return null;
 		}
 
-		return null;
+		$fileContent = file_get_contents($cacheFile);
+		$payload = json_decode($fileContent, true);
 
+		if (!is_array($payload)) {
+			$this->delete();
+			return null;
+		}
+
+		if (
+			!isset($payload['created']) ||
+			!isset($payload['expire']) ||
+			!array_key_exists('data', $payload)
+		) {
+			$this->delete();
+			return null;
+		}
+
+		$isExpired = $payload['expire'] !== 0 && time() > ($payload['created'] + $payload['expire']);
+
+		if ($isExpired) {
+			$this->delete();
+			return null;
+		}
+
+		return $payload['data'];
 	}
 
-	public function save($data) {
+	public function save($data, ?int $expire = null): void {
+		$expire = $expire ?? $this->cacheExpire;
 
-		if ($this->cacheExpire == 0) {return;}
+		if ($expire === 0) {
+			return;
+		}
 
-		if (!is_dir($this->cacheDirectory)) {mkdir($this->cacheDirectory);}
-		$cacheFile = $this->cacheDirectory . DIRECTORY_SEPARATOR . $this->cacheIdentifier;
+		$this->ensure_cache_directory_exists();
 
-		file_put_contents($cacheFile, serialize($data));
+		$payload = [
+			'created' => time(),
+			'expire' => $expire,
+			'data' => $data,
+		];
+
+		file_put_contents(
+			$this->get_cache_file_path(),
+			json_encode($payload),
+			LOCK_EX
+		);
 	}
 
-	public function flush() {
-		$files = glob($this->cacheDirectory . DIRECTORY_SEPARATOR . '*');
-		foreach($files as $file){
-		  if(is_file($file))
-		    unlink($file);
+	public function delete(): void {
+		$cacheFile = $this->get_cache_file_path();
+
+		if (is_file($cacheFile)) {
+			unlink($cacheFile);
 		}
 	}
 
-	private function cache_is_valid($filepath, $expireTime) {
-		if (file_exists($filepath) && (time() - $expireTime < filemtime($filepath))) {
-			return true;
+	public function flush(): void {
+		if (!is_dir($this->cacheDirectory)) {
+			return;
 		}
-		return false;
+
+		$files = glob($this->cacheDirectory . DIRECTORY_SEPARATOR . '*.cache');
+
+		foreach ($files as $filePath) {
+			if (is_file($filePath)) {
+				unlink($filePath);
+			}
+		}
 	}
 
+	private function get_cache_file_path(): string {
+		return $this->cacheDirectory . DIRECTORY_SEPARATOR . $this->cacheIdentifier . '.cache';
+	}
+
+	private function ensure_cache_directory_exists(): void {
+		if (!is_dir($this->cacheDirectory)) {
+			mkdir($this->cacheDirectory, 0777, true);
+		}
+	}
+
+	private function build_identifier($identifier): string {
+		if (is_array($identifier)) {
+			return implode('_', $identifier);
+		}
+
+		return (string) $identifier;
+	}
 }
