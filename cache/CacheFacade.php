@@ -4,13 +4,17 @@ namespace flundr\cache;
 
 class CacheFacade {
 	
-	public static function bind($identifier, $content, int $expire = 30) {
+	public static function bind($identifier, $content, int $expire = 60) {
 		$cacheKey = self::buildIdentifier($identifier);
 		$cache = new RequestCache($cacheKey, $expire);
 		$cache->save($content);
 	}
 
-	public static function save($identifier, $content, int $expire = 30) {
+	public static function save($identifier, $content, int $expire = 60) {
+		self::bind($identifier, $content, $expire);
+	}
+
+	public static function set($identifier, $content, int $expire = 60) {
 		self::bind($identifier, $content, $expire);
 	}
 
