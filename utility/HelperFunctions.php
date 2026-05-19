@@ -131,7 +131,6 @@ function empty_to_null($array) {
 }
 
 function session($var) {
-	\flundr\utility\Session::init();
 	return \flundr\utility\Session::get($var);
 }
 

@@ -11,10 +11,10 @@ class Session
 		}
 	}
 
-    // Alias for init
-    public static function open() {
-        self::init();
-    }
+	// Alias for init
+	public static function open() {
+		self::init();
+	}
 
 	// Save session and release lock
 	public static function close() {
