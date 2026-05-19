@@ -21,6 +21,7 @@ class Application {
 			Session::init();
 			$this->handle_URL_routing();
 			$this->identify_user();
+			Session::close();
 			$this->run_controller();
 		}
 

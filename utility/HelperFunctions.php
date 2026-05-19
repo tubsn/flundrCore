@@ -131,6 +131,7 @@ function empty_to_null($array) {
 }
 
 function session($var) {
+	\flundr\utility\Session::init();
 	return \flundr\utility\Session::get($var);
 }
 
@@ -159,3 +160,4 @@ function auth_groups($groups) {
 
 // Facades
 class_alias(\flundr\cache\CacheFacade::class, 'Cache');
+class_alias(\flundr\utility\Session::class, 'Session');
