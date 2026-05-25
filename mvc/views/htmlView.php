@@ -5,6 +5,7 @@ namespace flundr\mvc\views;
 use \flundr\rendering\TemplateEngine;
 use \flundr\rendering\QuickDump;
 use \flundr\utility\Session;
+use \flundr\utility\Breadcrumbs;
 use \flundr\mvc\ViewInterface;
 
 abstract class htmlView implements ViewInterface {
@@ -17,6 +18,8 @@ abstract class htmlView implements ViewInterface {
 	public $js = null;
 	public $framework = null;
 	public $modules = null;	
+	public $breadcrumbGenerator = null;
+	public $breadcrumbs = null;
 	public $templates = [];
 	public $templateVars = [];
 
@@ -41,11 +44,6 @@ abstract class htmlView implements ViewInterface {
 	// Allows User to directly inject Data to the Views $templateVars
 	public function __set($index, $value) {
 		$this->templateVars[$index] = $value;
-		/* Validation?
-		if (isset($this->templateVars[$index])) {
-			$this->templateVars[$index] = $value;
-		} else {throw new \Exception('Template Variable "'.$index.'" not Registered in '. get_class(), 403);}
-		*/
 	}
 
 	public function __get($name) {
@@ -67,6 +65,19 @@ abstract class htmlView implements ViewInterface {
 		Session::set('referer', $url);
 	}
 
+	public function add_breadcrumb($name, $url = null) {
+		if (!$this->breadcrumbGenerator) {
+			$this->breadcrumbGenerator = new Breadcrumbs();
+		}
+		$this->breadcrumbGenerator->add($name, $url);
+		$this->breadcrumbs = $this->breadcrumbGenerator->generate();
+	}
+
+	public function breadcrumbs() {
+		if (!$this->breadcrumbGenerator) {return [];}
+		return $this->breadcrumbGenerator->generate();
+	}
+
 	// Json Export
 	public function json($templateData) {
 		header("Content-type: application/json; charset=utf-8");
@@ -86,6 +97,7 @@ abstract class htmlView implements ViewInterface {
 		// Meta Data is gathered in a "page" Variable
 		$page['title'] = $this->title;
 		$page['description'] = $this->description;
+		$page['breadcrumbs'] = $this->breadcrumbs;
 		$page['css'] = $this->to_array($this->css);
 		$page['fonts'] = $this->fonts;
 		$page['meta'] = $this->meta;
