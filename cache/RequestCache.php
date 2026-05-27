@@ -4,6 +4,7 @@ namespace flundr\cache;
 
 class RequestCache {
 
+	public $cacheDisabled = false;
 	public $cacheIdentifier;
 	public $cacheExpire;
 	private $cacheDirectory = ROOT . 'cache';
@@ -36,6 +37,9 @@ class RequestCache {
 	}
 
 	public function get() {
+
+		if ($this->cacheDisabled) {return null;}
+
 		$cacheFile = $this->get_cache_file_path();
 
 		if (!is_file($cacheFile)) {
