@@ -45,6 +45,12 @@ class TemplateEngine {
 		foreach ($this->templateBlocks as $currentTemplateName => $templatePath) {
 
 			if (!$templatePath) {continue;}
+
+			if (is_array($templatePath) && isset($templatePath['raw'])) {
+				echo $templatePath['raw'];
+				continue;
+			}
+
 			$templatePath = $this->full_path($templatePath);
 
 			if (!file_exists($templatePath)) {
