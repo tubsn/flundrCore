@@ -33,12 +33,11 @@ class LoginHandler
 	public function login($userLogin,$userPW) {
 
 		$user = $this->get_user_by_mail($userLogin);
-
 		$recorder = new AuthRecorder($user['id']);
 
-		if (!password_verify($userPW, $user['password'])) {
+		if (empty($userPW) || empty($user['password']) || !password_verify($userPW, $user['password'])) {
 			$recorder->prevent_brute_force();
-			throw new \Exception("Login Failed: wrong Password");
+			throw new \Exception("Login failed: wrong Password");
 		}
 
 		$recorder->login_successful();
